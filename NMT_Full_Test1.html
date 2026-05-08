@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMT Повний тест | Loving Lessons</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#C00000;--red-dark:#8a0000;--red-light:#fdf2f2;--ink:#1a1008;--warm:#f5f0e8;--cream:#faf7f2;--border:#e8ddd0;--gray:#7a6f65;--green:#1a5c2a}
+body{font-family:Georgia,serif;background:var(--cream);color:var(--ink);min-height:100vh}
+.app-header{background:var(--red);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.brand{color:#fff;font-family:Georgia,serif;font-size:.95rem;font-weight:700}
+.brand span{opacity:.7;font-weight:400;font-size:.75rem;display:block}
+.header-right{display:flex;align-items:center;gap:1rem}
+.timer-display{color:#fff;font-family:monospace;font-size:1.1rem;background:rgba(0,0,0,.2);padding:4px 10px;border-radius:6px}
+.screen-lbl{color:#fff;opacity:.75;font-size:.78rem}
+.screen{display:block;visibility:hidden;position:absolute;top:0;left:0;width:100%;pointer-events:none;opacity:0}
+.screen.active{visibility:visible;position:relative;pointer-events:auto;opacity:1}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:760px;margin:0 auto;padding:1.5rem 1rem;display:block}
+
+/* START */
+.start-hero{background:var(--red);color:#fff;border-radius:12px;padding:2.5rem;text-align:center;margin-bottom:1.5rem}
+.start-hero h1{font-family:Georgia,serif;font-size:2rem;margin-bottom:.5rem}
+.start-hero p{opacity:.85;font-size:.9rem;margin-bottom:1.5rem}
+.start-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.5rem}
+.start-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.9rem;text-align:center}
+.start-card .num{font-size:1.6rem;font-weight:700;color:var(--red);font-family:Georgia,serif}
+.start-card .lbl{font-size:.72rem;color:var(--gray);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.btn-main{display:block;width:100%;background:var(--red);color:#fff;border:none;padding:.9rem;border-radius:8px;font-family:Georgia,serif;font-size:1rem;cursor:pointer;transition:background .2s;letter-spacing:.3px}
+.btn-main:hover{background:var(--red-dark)}
+.btn-main:disabled{background:#ccc;cursor:not-allowed}
+
+/* TASK HEADERS */
+.task-header{padding-bottom:1rem;margin-bottom:1.2rem;border-bottom:2px solid var(--red)}
+.task-badge{display:inline-block;background:var(--red);color:#fff;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:.5rem}
+.task-title{font-family:Georgia,serif;font-size:1.3rem;color:var(--ink)}
+.task-instruction{font-size:.82rem;color:var(--gray);font-style:italic;margin-top:.3rem;line-height:1.5}
+.task-counter{font-size:.78rem;color:var(--gray);margin-top:.4rem}
+
+/* OPTIONS BAR */
+.options-bar{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
+.options-bar-title{font-size:.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.6rem}
+.opts-grid{display:flex;flex-direction:column;gap:.35rem;overflow:visible}
+.opt-tag{display:flex;align-items:flex-start;gap:.5rem;font-size:.84rem;line-height:1.4;padding:4px 6px;border-radius:4px;transition:all .2s}
+.opt-tag.used{opacity:.4;text-decoration:line-through}
+.opt-letter{font-weight:700;color:var(--red);flex-shrink:0;min-width:16px}
+
+/* TEXT CARDS */
+.text-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.4rem;margin-bottom:1.2rem}
+.text-card-title{font-family:Georgia,serif;font-size:1.1rem;color:var(--ink);margin-bottom:.8rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.text-body{font-size:.88rem;line-height:1.85;color:#2a2a2a}
+.text-body p{margin-bottom:.8rem}
+.text-body p:last-child{margin-bottom:0}
+
+/* AD CARDS */
+.ad-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:1.3rem;margin-bottom:1rem;position:relative;overflow:visible;display:block}
+.ad-num{position:static;display:inline-block;background:var(--red);color:#fff;font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:10px;margin-bottom:.5rem}
+.ad-title{font-family:Georgia,serif;font-size:1.05rem;color:var(--red);margin-bottom:.25rem}
+.ad-tagline{font-style:italic;color:var(--gray);font-size:.83rem;margin-bottom:.7rem}
+.ad-body{font-size:.84rem;line-height:1.65;color:#333}
+.ad-body ul{list-style:none;margin:.4rem 0}
+.ad-body ul li::before{content:'—';color:var(--red);margin-right:.4rem}
+.ad-contact{margin-top:.6rem;font-size:.78rem;color:var(--gray)}
+
+/* DROPDOWNS */
+.dropdown-wrap{margin-top:.8rem;border-top:1px solid var(--border);padding-top:.8rem}
+.dropdown-q{font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:.5rem}
+select.ans-select{width:100%;padding:.55rem .8rem;border:1.5px solid var(--red);border-radius:6px;font-family:'Source Serif 4',serif;font-size:.85rem;color:var(--ink);background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C00000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:all .2s}
+select.ans-select:focus{outline:none;background-color:var(--red-light)}
+select.ans-select.answered{background-color:var(--red-light);font-weight:600}
+
+/* PARA CARDS */
+.para-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:1.3rem;margin-bottom:1rem;position:relative}
+.para-num{position:absolute;top:-11px;left:1rem;background:var(--ink);color:#fff;font-size:.7rem;font-weight:700;padding:2px 9px;border-radius:10px}
+.para-city{font-family:Georgia,serif;font-size:1rem;color:var(--red);margin-bottom:.6rem}
+
+/* TASK 2 */
+.t2-wrap{display:grid;gap:1.2rem}
+@media(min-width:680px){.t2-wrap{grid-template-columns:1fr 1fr;align-items:start}}
+.t2-text{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.3rem}
+@media(min-width:680px){.t2-text{position:sticky;top:68px}}
+.t2-text h3{font-family:Georgia,serif;font-size:1.05rem;color:var(--red);margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.q-panel{}
+.q-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-bottom:.8rem}
+.q-num-lbl{font-size:.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}
+.q-text{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:.8rem;line-height:1.4}
+.q-opts{display:flex;flex-direction:column;gap:.4rem}
+.q-opt{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .8rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;background:#fff;text-align:left;font-family:'Source Serif 4',serif;font-size:.84rem;color:var(--ink);width:100%}
+.q-opt:hover{border-color:var(--red);background:var(--red-light)}
+.q-opt.selected{border-color:var(--red);background:var(--red-light)}
+.q-opt-letter{min-width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--gray);flex-shrink:0;transition:all .15s}
+.q-opt.selected .q-opt-letter{background:var(--red);border-color:var(--red);color:#fff}
+
+/* GAP INLINE */
+.gap-wrap{display:inline-block;vertical-align:middle;margin:0 2px}
+.gap-num{font-size:.62rem;color:var(--red);font-weight:700;vertical-align:super;margin-right:1px}
+select.gap-select{padding:2px 22px 2px 5px;border:1.5px solid var(--red);border-radius:5px;font-family:'Source Serif 4',serif;font-size:.82rem;color:var(--ink);background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C00000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 5px center;transition:all .2s}
+select.gap-select:focus{outline:none;background-color:var(--red-light)}
+select.gap-select.answered{background-color:var(--red-light);font-weight:600}
+
+/* BUTTONS */
+.check-row{margin-top:1rem;display:flex;flex-direction:column;gap:.4rem;align-items:center}
+.btn-check{background:var(--red);color:#fff;border:none;padding:.8rem 2rem;border-radius:8px;font-family:Georgia,serif;font-size:.9rem;cursor:pointer;transition:background .2s;width:100%}
+.btn-check:hover:not(:disabled){background:var(--red-dark)}
+.btn-check:disabled{background:#ccc;cursor:not-allowed}
+.check-hint{font-size:.76rem;color:var(--gray);text-align:center}
+.btn-next{background:var(--red);color:#fff;border:none;padding:.7rem 1.5rem;border-radius:8px;font-family:Georgia,serif;font-size:.88rem;cursor:pointer;transition:background .2s;margin-top:.6rem}
+.btn-next:hover{background:var(--red-dark)}
+
+/* RESULTS */
+.results-top{background:var(--red);color:#fff;border-radius:10px;padding:1.4rem;text-align:center;margin-bottom:1.5rem}
+.results-top h2{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:.3rem}
+.results-time{opacity:.8;font-size:.85rem;margin-bottom:1rem}
+.score-total{font-family:Georgia,serif;font-size:3.5rem;font-weight:900;line-height:1}
+.score-total-lbl{opacity:.75;font-size:.85rem}
+.tasks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.5rem}
+@media(min-width:500px){.tasks-grid{grid-template-columns:repeat(6,1fr)}}
+.task-score-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:.8rem;text-align:center}
+.task-score-card .ts-lbl{font-size:.65rem;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem}
+.task-score-card .ts-num{font-size:1.3rem;font-weight:700;color:var(--red);font-family:Georgia,serif}
+.task-score-card .ts-max{font-size:.7rem;color:var(--gray)}
+
+.exp-section{margin-bottom:2rem}
+.exp-section-title{font-family:Georgia,serif;font-size:1rem;color:var(--red);margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:2px solid var(--red);text-transform:uppercase;letter-spacing:.5px}
+.exp-item{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:.8rem;overflow:hidden}
+.exp-item.correct{border-left:4px solid var(--green)}
+.exp-item.wrong{border-left:4px solid var(--red)}
+.exp-head{padding:.75rem 1rem .5rem;display:flex;align-items:center;gap:.5rem}
+.exp-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.exp-icon.correct{background:#dcfce7;color:var(--green)}
+.exp-icon.wrong{background:#fee2e2;color:var(--red)}
+.exp-verdict{font-size:.82rem;font-weight:700}
+.exp-verdict.correct{color:var(--green)}
+.exp-verdict.wrong{color:var(--red)}
+.exp-body{padding:.2rem 1rem .8rem}
+.exp-user{font-size:.75rem;color:var(--red);margin-bottom:.15rem}
+.exp-right{font-size:.75rem;color:var(--green);font-weight:600;margin-bottom:.4rem}
+.exp-text{font-size:.81rem;line-height:1.55;color:#444}
+.exp-text em{color:var(--red);font-style:italic}
+.exp-text strong{color:var(--ink)}
+
+.distractor-box{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-top:.8rem}
+.distractor-box h4{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.d-item{margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.d-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.d-lbl{font-size:.72rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.2rem}
+.d-text{font-size:.8rem;line-height:1.5;color:#444}
+
+.answer-inline.correct{color:var(--green);font-weight:700;border-bottom:2px solid var(--green)}
+.answer-inline.wrong{color:var(--red);font-weight:700;text-decoration:line-through}
+.answer-inline.correct-show{color:var(--green);font-weight:700}
+</style>
+</head>
+<body><div id="sw" style="position:relative;width:100%;min-height:100vh">
+<div class="app-header">
+  <div class="brand">Loving Lessons<span>@English__on_the_go</span></div>
+  <div class="header-right">
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div class="screen-lbl" id="screenLbl">NMT Test</div>
+  </div>
+</div>
+
+<!-- START -->
+<div id="sStart" class="screen active">
+<div class="container">
+  <div class="start-hero">
+    <div style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;background:rgba(255,255,255,.2);display:inline-block;padding:3px 12px;border-radius:20px;margin-bottom:.8rem">Авторський тест</div>
+    <h1>Повний НМТ</h1>
+    <p>Reading + Use of English — 32 питання</p>
+  </div>
+  <div class="start-grid">
+    <div class="start-card"><div class="num">4</div><div class="lbl">Reading Tasks</div></div>
+    <div class="start-card"><div class="num">2</div><div class="lbl">Use of English</div></div>
+    <div class="start-card"><div class="num">32</div><div class="lbl">Питань</div></div>
+  </div>
+  <button class="btn-main" onclick="startTest()">Розпочати тест →</button>
+</div>
+</div>
+
+<!-- TASK 1 -->
+<div id="sTask1" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 1 — Reading</div>
+    <div class="task-title">Встановлення відповідності</div>
+    <div class="task-instruction">Read the texts below. Match choices (A–H) to (1–5). There are three choices you do not need to use.</div>
+    <div class="task-counter" id="t1counter">Відповіді: 0 / 5</div>
+  </div>
+  <div class="options-bar">
+    <div class="options-bar-title">Варіанти відповідей A–H</div>
+    <div class="opts-grid" id="t1opts">
+      <div class="opt-tag" id="t1o-A"><span class="opt-letter">A</span>soft skills development</div>
+      <div class="opt-tag" id="t1o-B"><span class="opt-letter">B</span>outdoor adventure</div>
+      <div class="opt-tag" id="t1o-C"><span class="opt-letter">C</span>hotel chain</div>
+      <div class="opt-tag" id="t1o-D"><span class="opt-letter">D</span>arts and crafts</div>
+      <div class="opt-tag" id="t1o-E"><span class="opt-letter">E</span>environmental charity</div>
+      <div class="opt-tag" id="t1o-F"><span class="opt-letter">F</span>accommodation</div>
+      <div class="opt-tag" id="t1o-G"><span class="opt-letter">G</span>transportation</div>
+      <div class="opt-tag" id="t1o-H"><span class="opt-letter">H</span>wellness</div>
+    </div>
+  </div>
+
+  <!-- Ad 1 -->
+  <div class="ad-card" style="display:block;visibility:visible;opacity:1">
+    <div class="ad-num">1</div>
+    <div class="ad-title">Peak Explorers</div>
+    <div class="ad-tagline">The mountains are calling!</div>
+    <div class="ad-body">
+      Join us for an unforgettable weekend in the Carpathians — hiking, rock climbing and zip-lining for all skill levels.<br><br>
+      <ul><li>Every weekend, May–October</li><li>Camping gear provided</li><li>Suitable for beginners and experienced adventurers</li><li>Group discounts available</li></ul>
+      <div class="ad-contact">📞 0800 321 456 | 🌐 www.peakexplorers.ua</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="ans-select" id="t1q1" onchange="t1pick(1,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — soft skills development</option><option value="B">B — outdoor adventure</option><option value="C">C — hotel chain</option><option value="D">D — arts and crafts</option><option value="E">E — environmental charity</option><option value="F">F — accommodation</option><option value="G">G — transportation</option><option value="H">H — wellness</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ad 2 -->
+  <div class="ad-card" style="display:block;visibility:visible;opacity:1">
+    <div class="ad-num">2</div>
+    <div class="ad-title">The Clay Studio</div>
+    <div class="ad-tagline">Get your hands dirty — in the best way.</div>
+    <div class="ad-body">
+      Join our weekly pottery and ceramics workshops. No experience needed — just creativity and curiosity.<br><br>
+      <ul><li>Small groups (max 8 people)</li><li>All materials included</li><li>Take your finished pieces home</li><li>Gift vouchers available</li></ul>
+      <div class="ad-contact">📧 hello@theclaystudio.com | 📍 14 Bankova Street, Kyiv</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="ans-select" id="t1q2" onchange="t1pick(2,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — soft skills development</option><option value="B">B — outdoor adventure</option><option value="C">C — hotel chain</option><option value="D">D — arts and crafts</option><option value="E">E — environmental charity</option><option value="F">F — accommodation</option><option value="G">G — transportation</option><option value="H">H — wellness</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ad 3 -->
+  <div class="ad-card" style="display:block;visibility:visible;opacity:1">
+    <div class="ad-num">3</div>
+    <div class="ad-title">StayEasy Guesthouses</div>
+    <div class="ad-tagline">Feel at home, wherever you are.</div>
+    <div class="ad-body">
+      Looking for comfortable, affordable short-term stays across Ukraine? StayEasy offers cosy rooms and self-catering apartments in over 30 cities.<br><br>
+      <ul><li>Daily, weekly and monthly rates</li><li>24/7 check-in</li><li>Pet-friendly options available</li><li>Rated 4.8/5 by guests</li></ul>
+      <div class="ad-contact">🌐 www.stayeasy.ua | 📱 Book via our app</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="ans-select" id="t1q3" onchange="t1pick(3,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — soft skills development</option><option value="B">B — outdoor adventure</option><option value="C">C — hotel chain</option><option value="D">D — arts and crafts</option><option value="E">E — environmental charity</option><option value="F">F — accommodation</option><option value="G">G — transportation</option><option value="H">H — wellness</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ad 4 -->
+  <div class="ad-card" style="display:block;visibility:visible;opacity:1">
+    <div class="ad-num">4</div>
+    <div class="ad-title">Serenity Spa</div>
+    <div class="ad-tagline">Slow down. Breathe. Restore.</div>
+    <div class="ad-body">
+      Treat yourself to a full day of relaxation with our signature packages — massage, aromatherapy, and guided meditation sessions.<br><br>
+      <ul><li>Weekday packages from ₴890</li><li>Perfect as a gift</li><li>Private and group sessions available</li><li>Advance booking recommended</li></ul>
+      <div class="ad-contact">📞 044 789 0012 | 🌐 www.serenityspa.ua</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="ans-select" id="t1q4" onchange="t1pick(4,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — soft skills development</option><option value="B">B — outdoor adventure</option><option value="C">C — hotel chain</option><option value="D">D — arts and crafts</option><option value="E">E — environmental charity</option><option value="F">F — accommodation</option><option value="G">G — transportation</option><option value="H">H — wellness</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ad 5 -->
+  <div class="ad-card" style="display:block;visibility:visible;opacity:1">
+    <div class="ad-num">5</div>
+    <div class="ad-title">GreenRide Ukraine</div>
+    <div class="ad-tagline">Your city, your way.</div>
+    <div class="ad-body">
+      Rent electric scooters and bicycles by the minute, hour or day. No registration fees — just download the app and go.<br><br>
+      <ul><li>500+ stations across Kyiv, Lviv and Odesa</li><li>Fully charged, always ready</li><li>Pay as you go — no subscription needed</li><li>Zero emissions, 100% fun</li></ul>
+      <div class="ad-contact">📱 Download GreenRide on App Store &amp; Google Play</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="ans-select" id="t1q5" onchange="t1pick(5,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — soft skills development</option><option value="B">B — outdoor adventure</option><option value="C">C — hotel chain</option><option value="D">D — arts and crafts</option><option value="E">E — environmental charity</option><option value="F">F — accommodation</option><option value="G">G — transportation</option><option value="H">H — wellness</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="check-row">
+    <button class="btn-check" id="t1btn" onclick="goTo('sTask2')" disabled>Перейти до Task 2 →</button>
+    <div class="check-hint" id="t1hint">Оберіть відповідь для кожної реклами</div>
+  </div>
+</div>
+</div>
+
+<!-- TASK 2 -->
+<div id="sTask2" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 2 — Reading</div>
+    <div class="task-title">Multiple Choice</div>
+    <div class="task-instruction">Read the text below. For questions 6–10 choose the correct answer (A, B, C or D).</div>
+    <div class="task-counter" id="t2counter">Відповіді: 0 / 5</div>
+  </div>
+  <div class="t2-wrap">
+    <div class="t2-text">
+      <h3>The Boy King of Ancient Egypt</h3>
+      <div class="text-body">
+        <p>He was not the most powerful pharaoh Egypt ever had. He did not win great battles or build towering monuments. Yet Tutankhamun is the most famous ruler in the history of Ancient Egypt — and the reason for that fame is not connected with what he achieved in life.</p>
+        <p>Tutankhamun was born around 1341 BC, the son of the controversial pharaoh Akhenaten, who had attempted to overturn Egypt's traditional religion and replace its many gods with the worship of a single deity. When Akhenaten died, the country was in disorder. Tutankhamun came to the throne at around the age of nine, making him one of the youngest rulers in Egyptian history. Advised by powerful officials, he immediately set about restoring the old religion and repairing the damage his father had caused.</p>
+        <p>His reign lasted only about ten years. Tutankhamun died at around the age of nineteen, and the cause of his death has been debated for over a century. Some researchers have pointed to evidence of a broken leg, which may have become infected. Others believe he suffered from a combination of inherited health conditions. What archaeologists do know is that his tomb is significantly smaller and simpler than those of other pharaohs of similar status, and that some of the objects buried with him appear to have been made for someone else — both signs that his burial was arranged with unusual speed.</p>
+        <p>For over three thousand years, his tomb lay undiscovered beneath the sands of the Valley of the Kings. That changed on the 4th of November 1922, when British archaeologist Howard Carter uncovered the entrance to a sealed chamber. What followed was one of the greatest archaeological discoveries in history. The tomb contained over five thousand items, including the iconic golden death mask that has since become one of the most recognised images in the world. Remarkably, unlike most royal tombs in Egypt, it had never been looted.</p>
+        <p>Today, Tutankhamun continues to fascinate scientists and historians alike. Advances in DNA analysis and medical imaging have allowed researchers to learn more about his health and family background than ever before. In 2022, a new grand museum near the pyramids of Giza was opened to house his treasures permanently. Through the remarkable preservation of his tomb, we have gained a rare and detailed glimpse into Ancient Egypt — its religious rituals, royal burial customs, craftsmanship, and the objects that surrounded those at the very top of its society. Tutankhamun never ruled long enough to leave a political legacy — but the world he left behind him has proved impossible to forget.</p>
+      </div>
+    </div>
+    <div class="q-panel" id="t2panel"></div>
+  </div>
+</div>
+</div>
+
+<!-- TASK 3 -->
+<div id="sTask3" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 3 — Reading</div>
+    <div class="task-title">Встановлення відповідності</div>
+    <div class="task-instruction">Read the texts below. Match choices (A–H) to (11–16). There are two choices you do not need to use.</div>
+    <div class="task-counter" id="t3counter">Відповіді: 0 / 6</div>
+  </div>
+  <div class="options-bar">
+    <div class="options-bar-title">Варіанти відповідей A–H</div>
+    <div class="opts-grid" id="t3opts">
+      <div class="opt-tag" id="t3o-A"><span class="opt-letter">A</span>has a half of it dedicated entirely to the afterlife</div>
+      <div class="opt-tag" id="t3o-B"><span class="opt-letter">B</span>is home to the world's oldest surviving library</div>
+      <div class="opt-tag" id="t3o-C"><span class="opt-letter">C</span>is where the first paper money in history was used</div>
+      <div class="opt-tag" id="t3o-D"><span class="opt-letter">D</span>used to be the crossroads for buying and exchanging goods</div>
+      <div class="opt-tag" id="t3o-E"><span class="opt-letter">E</span>is the birthplace of public decision-making</div>
+      <div class="opt-tag" id="t3o-F"><span class="opt-letter">F</span>has remained inhabited for over eleven millennia</div>
+      <div class="opt-tag" id="t3o-G"><span class="opt-letter">G</span>is the place where the first alphabet was created</div>
+      <div class="opt-tag" id="t3o-H"><span class="opt-letter">H</span>serves as a famous destination for religious travelers</div>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">11</div>
+    <div class="para-city">Jericho</div>
+    <div class="text-body">Jericho, located near the Jordan River, is believed to be the oldest city in the world that people have never stopped living in. Scientists have found signs of human settlement here going back at least 11,000 years. The city sits about 250 metres below sea level, which makes it the lowest city on Earth. Today around 20,000 people still call it home, growing tropical fruits in soil made rich by natural springs that have drawn people to this place since prehistoric times.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q1" onchange="t3pick(1,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">12</div>
+    <div class="para-city">Byblos</div>
+    <div class="text-body">Byblos is a city on the coast of Lebanon that has been lived in for around 7,000 years. It was the primary place where the Greeks bought Egyptian writing materials. Because of this, the city's name became the root for words related to books and literature. It is also credited as the birthplace of the first phonetic writing system using letters, which replaced complicated picture-based scripts. Today visitors can see Roman ruins, a medieval castle, and a busy fishing harbour all in the same place.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q2" onchange="t3pick(2,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">13</div>
+    <div class="para-city">Luxor</div>
+    <div class="text-body">Luxor in southern Egypt is built on the ruins of Thebes, which was once the capital of the most powerful empire in the ancient world. The city is split into two by the Nile — on one side is the living city with its temples and markets, and on the other side, there is nothing but the famous burial grounds where pharaohs were laid to rest for thousands of years. The temples at Karnak and Luxor are among the largest ever built anywhere on Earth. It is one of the few places where a person can have breakfast in a modern café and walk to a 3,500-year-old monument in just a few minutes.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q3" onchange="t3pick(3,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">14</div>
+    <div class="para-city">Aleppo</div>
+    <div class="text-body">Aleppo in northern Syria was for centuries one of the busiest trading cities in the world, sitting at the centre of the ancient Silk Road routes that connected Europe and Asia. Its famous covered market is the longest in the world, stretching for over twelve kilometres through narrow stone passages. In recent years, Aleppo suffered great damage during a long civil war that began in 2011 and forced many of its people to leave. However, many residents have since returned, and the city is slowly being rebuilt. Aleppo's story is one of both great history and great resilience.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q4" onchange="t3pick(4,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">15</div>
+    <div class="para-city">Athens</div>
+    <div class="text-body">Athens is one of the oldest cities in Europe and is known as the place where democracy and philosophy were born. More than 3,000 years ago it was already a powerful city whose ideas about government and science went on to influence the whole Western world. At the centre of the city stands the Acropolis, a hill that has been used continuously as a place of worship and ceremony since the Bronze Age. Unlike many ancient cities, Athens was never completely abandoned or destroyed. Today it is a busy modern capital of four million people built directly on top of thousands of years of history.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q5" onchange="t3pick(5,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="para-card">
+    <div class="para-num">16</div>
+    <div class="para-city">Varanasi</div>
+    <div class="text-body">Varanasi is the spiritual heart of India and is often called the "City of Light." According to tradition, it was founded by the Hindu god Shiva. Its most defining visual feature is the Ghats — a series of 84 sets of stone steps that lead directly into the Ganges River. People travel from all over the world to this city to perform sacred rituals in the water. It is unique because it is a "city of pilgrimage"; it is believed that if a person passes away in Varanasi, they are released from the cycle of rebirth, making it a sacred bridge between the physical and spiritual worlds.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which city ______?</div>
+      <select class="ans-select" id="t3q6" onchange="t3pick(6,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — has a half of it dedicated entirely to the afterlife</option><option value="B">B — is home to the world's oldest surviving library</option><option value="C">C — is where the first paper money in history was used</option><option value="D">D — used to be the crossroads for buying and exchanging goods</option><option value="E">E — is the birthplace of public decision-making</option><option value="F">F — has remained inhabited for over eleven millennia</option><option value="G">G — is the place where the first alphabet was created</option><option value="H">H — serves as a famous destination for religious travelers</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="check-row">
+    <button class="btn-check" id="t3btn" onclick="goTo('sTask4')" disabled>Перейти до Task 4 →</button>
+    <div class="check-hint" id="t3hint">Оберіть відповідь для кожного абзацу</div>
+  </div>
+</div>
+</div>
+
+<!-- TASK 4 -->
+<div id="sTask4" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 4 — Reading</div>
+    <div class="task-title">Заповнення пропусків</div>
+    <div class="task-instruction">Read the text below. For questions (17–22) choose from (A–H) the one which best fits each space. There are two choices you do not need to use.</div>
+    <div class="task-counter" id="t4counter">Відповіді: 0 / 6</div>
+  </div>
+  <div class="text-card">
+    <div class="text-card-title">The Revival of Handmade Traditions</div>
+    <div class="text-body">
+      <p>In our modern era, mass-produced items are often seen as the most convenient option for shoppers. However, a growing number of people are now choosing to buy traditional crafts instead of factory goods. Consumers, <span class="gap-wrap"><span class="gap-num">17</span><select class="gap-select" id="t4g1" onchange="t4pick(1,'D',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>, often look for products which are made from natural materials. These handmade items offer a level of quality that is significantly better <span class="gap-wrap"><span class="gap-num">18</span><select class="gap-select" id="t4g2" onchange="t4pick(2,'G',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>.</p>
+      <p>Many young artists, <span class="gap-wrap"><span class="gap-num">19</span><select class="gap-select" id="t4g3" onchange="t4pick(3,'A',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>, are returning to ancient techniques. For example, pottery and weaving, which were once essential daily skills, are now popular hobbies. Many find that practicing a manual skill is more relaxing than staring at a digital screen, <span class="gap-wrap"><span class="gap-num">20</span><select class="gap-select" id="t4g4" onchange="t4pick(4,'H',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>. Moreover, people enjoy the idea of owning something unique, rather than a boring object <span class="gap-wrap"><span class="gap-num">21</span><select class="gap-select" id="t4g5" onchange="t4pick(5,'B',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>.</p>
+      <p><span class="gap-wrap"><span class="gap-num">22</span><select class="gap-select" id="t4g6" onchange="t4pick(6,'E',this)"><option value="">—A–H—</option><option value="A">A — interested in preserving their cultural history</option><option value="B">B — manufactured by a machine in a distant country</option><option value="C">C — while they were becoming harder to sell online</option><option value="D">D — living in a world full of artificial plastic</option><option value="E">E — despite being a lot more expensive</option><option value="F">F — that are usually preferred by large companies</option><option value="G">G — than anything found in a standard supermarket</option><option value="H">H — although learning these crafts takes time</option></select></span>, handmade goods represent a more sustainable way of life. It is the best way to keep our history alive while reducing our impact on the environment.</p>
+    </div>
+  </div>
+
+  <div class="options-bar">
+    <div class="options-bar-title">Варіанти відповідей A–H</div>
+    <div class="opts-grid" id="t4opts">
+      <div class="opt-tag" id="t4o-A"><span class="opt-letter">A</span>interested in preserving their cultural history</div>
+      <div class="opt-tag" id="t4o-B"><span class="opt-letter">B</span>manufactured by a machine in a distant country</div>
+      <div class="opt-tag" id="t4o-C"><span class="opt-letter">C</span>while they were becoming harder to sell online</div>
+      <div class="opt-tag" id="t4o-D"><span class="opt-letter">D</span>living in a world full of artificial plastic</div>
+      <div class="opt-tag" id="t4o-E"><span class="opt-letter">E</span>despite being a lot more expensive</div>
+      <div class="opt-tag" id="t4o-F"><span class="opt-letter">F</span>that are usually preferred by large companies</div>
+      <div class="opt-tag" id="t4o-G"><span class="opt-letter">G</span>than anything found in a standard supermarket</div>
+      <div class="opt-tag" id="t4o-H"><span class="opt-letter">H</span>although learning these crafts takes time</div>
+    </div>
+  </div>
+
+  <div class="check-row">
+    <button class="btn-check" id="t4btn" onclick="goTo('sTask5')" disabled>Перейти до Task 5 →</button>
+    <div class="check-hint" id="t4hint">Заповніть усі 6 пропусків</div>
+  </div>
+</div>
+</div>
+
+<!-- TASK 5 -->
+<div id="sTask5" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 5 — Use of English</div>
+    <div class="task-title">Лексика</div>
+    <div class="task-instruction">Read the text below. For questions (23–27) choose the correct answer (A, B, C or D).</div>
+    <div class="task-counter" id="t5counter">Відповіді: 0 / 5</div>
+  </div>
+  <div class="text-card">
+    <div class="text-card-title">Medical Breakthrough</div>
+    <div class="text-body">
+      <p>A team of doctors recently <span class="gap-wrap"><span class="gap-num">23</span><select class="gap-select" id="t5g1" onchange="gapPick('t5',1,this)"><option value="">—A/B/C/D—</option><option value="A">A) did</option><option value="B">B) made</option><option value="C">C) set</option><option value="D">D) caught</option></select></span> a breakthrough in treating a rare heart condition that affects children born with weak heart muscles. For years, this illness was difficult to deal <span class="gap-wrap"><span class="gap-num">24</span><select class="gap-select" id="t5g2" onchange="gapPick('t5',2,this)"><option value="">—A/B/C/D—</option><option value="A">A) with</option><option value="B">B) at</option><option value="C">C) off</option><option value="D">D) about</option></select></span>, and many patients had to rely on long-term care. However, the new method allows doctors to take action much earlier, and for many families, this discovery has been a light at the end of the <span class="gap-wrap"><span class="gap-num">25</span><select class="gap-select" id="t5g3" onchange="gapPick('t5',3,this)"><option value="">—A/B/C/D—</option><option value="A">A) corridor</option><option value="B">B) hole</option><option value="C">C) tunnel</option><option value="D">D) room</option></select></span>.</p>
+      <p>The treatment involves a small device that helps the heart work more effectively. Doctors must carefully <span class="gap-wrap"><span class="gap-num">26</span><select class="gap-select" id="t5g4" onchange="gapPick('t5',4,this)"><option value="">—A/B/C/D—</option><option value="A">A) carry out</option><option value="B">B) carry away</option><option value="C">C) carry on</option><option value="D">D) carry over</option></select></span> the procedure, as it requires great precision. At <span class="gap-wrap"><span class="gap-num">27</span><select class="gap-select" id="t5g5" onchange="gapPick('t5',5,this)"><option value="">—A/B/C/D—</option><option value="A">A) last</option><option value="B">B) least</option><option value="C">C) once</option><option value="D">D) first</option></select></span>, some people were skeptical, but patients who take part in the program often get over the operation faster than expected.</p>
+    </div>
+  </div>
+  <div class="check-row">
+    <button class="btn-check" id="t5btn" onclick="goTo('sTask6')" disabled>Перейти до Task 6 →</button>
+    <div class="check-hint" id="t5hint">Заповніть усі 5 пропусків</div>
+  </div>
+</div>
+</div>
+
+<!-- TASK 6 -->
+<div id="sTask6" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-badge">Task 6 — Use of English</div>
+    <div class="task-title">Граматика</div>
+    <div class="task-instruction">Read the text below. For questions (28–32) choose the correct answer (A, B, C or D).</div>
+    <div class="task-counter" id="t6counter">Відповіді: 0 / 5</div>
+  </div>
+  <div class="text-card">
+    <div class="text-card-title">The Eiffel Tower</div>
+    <div class="text-body">
+      <p>In <span class="gap-wrap"><span class="gap-num">28</span><select class="gap-select" id="t6g1" onchange="gapPick('t6',1,this)"><option value="">—A/B/C/D—</option><option value="A">A) 19th</option><option value="B">B) the 19</option><option value="C">C) the 19s</option><option value="D">D) the 19th</option></select></span> century, the Eiffel Tower, which is now one of the most famous landmarks in the world, was built in Paris. The tower <span class="gap-wrap"><span class="gap-num">29</span><select class="gap-select" id="t6g2" onchange="gapPick('t6',2,this)"><option value="">—A/B/C/D—</option><option value="A">A) designing</option><option value="B">B) designed</option><option value="C">C) designs</option><option value="D">D) was designed</option></select></span> by Gustave Eiffel was created for the World's Fair. At first, it was criticized by many artists, who considered it too unusual. However, the structure, made of iron and standing over <span class="gap-wrap"><span class="gap-num">30</span><select class="gap-select" id="t6g3" onchange="gapPick('t6',3,this)"><option value="">—A/B/C/D—</option><option value="A">A) 300 metres tall</option><option value="B">B) 300-metres-tall</option><option value="C">C) 300-meter-tall</option><option value="D">D) 300 of meters tall</option></select></span>, was soon accepted by the public.</p>
+      <p>Today, the Eiffel Tower is visited by millions of tourists every year. Located in the center of Paris, it attracts people who are <span class="gap-wrap"><span class="gap-num">31</span><select class="gap-select" id="t6g4" onchange="gapPick('t6',4,this)"><option value="">—A/B/C/D—</option><option value="A">A) interest</option><option value="B">B) interesting</option><option value="C">C) interested</option><option value="D">D) interestingly</option></select></span> in history and architecture. Having been rebuilt and improved over time, the tower remains one of the city's <span class="gap-wrap"><span class="gap-num">32</span><select class="gap-select" id="t6g5" onchange="gapPick('t6',5,this)"><option value="">—A/B/C/D—</option><option value="A">A) greatest</option><option value="B">B) greater</option><option value="C">C) most great</option><option value="D">D) the greatest</option></select></span> achievements.</p>
+    </div>
+  </div>
+  <div class="check-row">
+    <button class="btn-check" id="t6btn" onclick="showResults()" disabled>Завершити тест →</button>
+    <div class="check-hint" id="t6hint">Заповніть усі 5 пропусків</div>
+  </div>
+</div>
+</div>
+
+<!-- RESULTS -->
+<div id="sResults" class="screen">
+<div class="container">
+  <div class="results-top">
+    <h2>Результати тесту</h2>
+    <div class="results-time" id="finalTime"></div>
+    <div class="score-total" id="totalScore"></div>
+    <div class="score-total-lbl">з 32 балів</div>
+  </div>
+  <div class="tasks-grid" id="tasksGrid"></div>
+  <div id="allExp"></div>
+  <button class="btn-main" onclick="restartTest()">Пройти тест ще раз</button>
+</div>
+</div>
+
+<script>
+// Force ad cards visible after page loads
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.ad-card').forEach(function(el) {
+    el.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;min-height:50px!important;background:#fff!important;border:1px solid #ccc!important;padding:1rem!important;margin-bottom:1rem!important;border-radius:8px!important';
+  });
+});
+// ===== DATA =====
+const T1_CORRECT = {1:'B',2:'D',3:'F',4:'H',5:'G'};
+const T1_LABELS = {A:'soft skills development',B:'outdoor adventure',C:'hotel chain',D:'arts and crafts',E:'environmental charity',F:'accommodation',G:'transportation',H:'wellness'};
+const T1_EXP = {
+  1:{correct:'B — outdoor adventure', exp:'Реклама пропонує похід, скелелазіння і зіп-лайнінг у Карпатах. "Hiking, rock climbing and zip-lining" та "Carpathians" — ключові слова. Дистрактор A) soft skills development — може ввести в оману через "all skill levels", але "skill levels" тут означає рівень фізичної підготовки, а не розвиток м\'яких або соціальних навичок. Дистрактор E) environmental charity — виглядає правдоподібно через природний контекст, але реклама не закликає до волонтерства чи благодійності.'},
+  2:{correct:'D — arts and crafts', exp:'Реклама пропонує майстер-класи з гончарства та кераміки. "Pottery and ceramics workshops" та "creativity" — чіткі ознаки. Дистрактор A) soft skills development — є типовою пасткою через слово "workshop", яке асоціюється з навчанням і розвитком навичок. Але тут розвиваються творчі, а не м\'які навички.'},
+  3:{correct:'F — accommodation', exp:'"Cosy rooms and self-catering apartments", "daily, weekly and monthly rates" — класичні ознаки. Дистрактор C) hotel chain — найнебезпечніша пастка: мережа в 30 містах звучить як готельна мережа, але StayEasy — це гостьові будиночки, а не готелі.'},
+  4:{correct:'H — wellness', exp:'"Massage, aromatherapy, and guided meditation sessions", "relaxation" — чіткі ознаки. Дистрактор E) environmental charity — може виглядати правдоподібно через спокійний тон реклами, але жодного зв\'язку з екологією немає.'},
+  5:{correct:'G — transportation', exp:'"Rent electric scooters and bicycles", "500+ stations across Kyiv, Lviv and Odesa" — класичні ознаки. Дистрактор E) environmental charity — найкраща пастка: "zero emissions", "green" звучить як екологічна ініціатива. Але реклама пропонує транспортну послугу за гроші, а не благодійність.'},
+  distractors:[
+    {lbl:'A — soft skills development', text:'Жодна реклама не стосується розвитку м\'яких або соціальних навичок. Може ввести в оману через "skill levels" у рекламі 1 або "workshops" у рекламі 2.'},
+    {lbl:'C — hotel chain', text:'Жодна реклама не представляє мережу готелів. Є типовою пасткою для реклами 3 — StayEasy працює в 30 містах, що звучить як мережа, але це гостьові будиночки.'},
+    {lbl:'E — environmental charity', text:'Жодна реклама не пов\'язана з екологічною благодійністю. Може спокусити через "zero emissions" і "green" у рекламі 5, або "Carpathians" у рекламі 1.'}
+  ]
+};
+
+const T2_QUESTIONS = [
+  {n:6,q:'What does the first paragraph tell us about Tutankhamun?',opts:{a:'He is celebrated for his success on the battlefield.',b:'His fame has nothing to do with what he did as a ruler.',c:'He was the most powerful pharaoh in Egypt.',d:'He built a few large monuments during his life.'},correct:'b'},
+  {n:7,q:'What does the text tell us about the start of Tutankhamun\'s time as ruler?',opts:{a:'He made all decisions by himself from the start.',b:'He was chosen because he was very talented.',c:'He had the help of experienced political figures.',d:'He refused to change anything his father had done.'},correct:'c'},
+  {n:8,q:'Which statement about Tutankhamun\'s death and burial is NOT correct?',opts:{a:'His tomb was grander than other pharaohs\' tombs.',b:'Nobody knows for certain why he died.',c:'Some objects in his tomb may have belonged to others.',d:'His burial seems to have been done in a hurry.'},correct:'a'},
+  {n:9,q:'What does the text say about Howard Carter\'s discovery?',opts:{a:'Carter had only just started looking when he found the tomb.',b:'He found the tomb following notes from earlier researchers.',c:'The tomb had been partly emptied before he arrived.',d:'The tomb contained a big collection of artefacts and a very important piece among them.'},correct:'d'},
+  {n:10,q:'What is the main idea of the text?',opts:{a:'Tutankhamun was a strong ruler who changed Ancient Egypt.',b:'Even though his reign was short, Tutankhamun gives us a rare look into the ancient world.',c:'Finding his tomb was the biggest moment in the history of archaeology.',d:'Scientists have now found the answer to how exactly Tutankhamun died.'},correct:'b'}
+];
+const T2_EXP = [
+  {correct:'b) His fame has nothing to do with what he did as a ruler.', exp:'Текст каже <em>"the reason for that fame is not connected with what he achieved in life"</em>. <strong>a)</strong> He is celebrated for his success on the battlefield — текст каже навпаки: <em>"He did not win great battles"</em>. <strong>c)</strong> He was the most powerful pharaoh — текст каже: <em>"He was not the most powerful pharaoh Egypt ever had"</em>. <strong>d)</strong> He built a few large monuments — текст каже: <em>"He did not build towering monuments"</em>.'},
+  {correct:'c) He had the help of experienced political figures.', exp:'Текст каже <em>"Advised by powerful officials"</em>. <strong>a)</strong> He made all decisions by himself — протилежне до написаного. <strong>b)</strong> He was chosen because he was very talented — не згадується в тексті. <strong>d)</strong> He refused to change anything — протилежне: він одразу почав відновлювати стару релігію.'},
+  {correct:'a) His tomb was grander than other pharaohs\' tombs.', exp:'Це NOT TRUE питання. Текст каже <em>"his tomb is significantly smaller and simpler than those of other pharaohs"</em> — тобто навпаки. <strong>b)</strong> Nobody knows for certain — правда: дебати тривають понад століття. <strong>c)</strong> Some objects may have belonged to others — правда: <em>"appear to have been made for someone else"</em>. <strong>d)</strong> Burial done in a hurry — правда: <em>"arranged with unusual speed"</em>.'},
+  {correct:'d) The tomb contained a big collection of artefacts and a very important piece among them.', exp:'Текст каже <em>"over five thousand items, including the iconic golden death mask"</em>. <strong>a)</strong> Carter had only just started looking — не згадується. <strong>b)</strong> He found the tomb following notes — не згадується. <strong>c)</strong> The tomb had been partly emptied — протилежне: <em>"it had never been looted"</em>.'},
+  {correct:'b) Even though his reign was short, Tutankhamun gives us a rare look into the ancient world.', exp:'Текст охоплює і короткість правління, і величезний культурний вплив через збережену гробницю. <strong>a)</strong> He was a strong ruler — протилежне: текст наголошує, що він не залишив політичної спадщини. <strong>c)</strong> Finding his tomb was the biggest moment — деталь, а не головна ідея. <strong>d)</strong> Scientists found the answer — протилежне: дебати тривають.'}
+];
+
+const T3_CORRECT = {1:'F',2:'G',3:'A',4:'D',5:'E',6:'H'};
+const T3_CITIES = {1:'Jericho',2:'Byblos',3:'Luxor',4:'Aleppo',5:'Athens',6:'Varanasi'};
+const T3_OPTS = {A:'has a half of it dedicated entirely to the afterlife',B:'is home to the world\'s oldest surviving library',C:'is where the first paper money in history was used',D:'used to be the crossroads for buying and exchanging goods',E:'is the birthplace of public decision-making',F:'has remained inhabited for over eleven millennia',G:'is the place where the first alphabet was created',H:'serves as a famous destination for religious travelers'};
+const T3_EXP = {
+  1:{correct:'F — has remained inhabited for over eleven millennia', exp:'Текст каже <em>"going back at least 11,000 years"</em> — "eleven millennia" = 11,000 років.'},
+  2:{correct:'G — is the place where the first alphabet was created', exp:'Текст каже <em>"birthplace of the first phonetic writing system using letters, which replaced complicated picture-based scripts"</em>.'},
+  3:{correct:'A — has a half of it dedicated entirely to the afterlife', exp:'Текст каже <em>"on the other side, there is nothing but the famous burial grounds where pharaohs were laid to rest"</em>. Золота рибка схована в середині абзацу.'},
+  4:{correct:'D — used to be the crossroads for buying and exchanging goods', exp:'Текст каже <em>"one of the busiest trading cities in the world"</em> і <em>"connected Europe and Asia"</em>.'},
+  5:{correct:'E — is the birthplace of public decision-making', exp:'Текст каже <em>"the place where democracy and philosophy were born"</em> — "public decision-making" = демократія.'},
+  6:{correct:'H — serves as a famous destination for religious travelers', exp:'Текст каже <em>"people travel from all over the world to this city to perform sacred rituals"</em>.'},
+  distractors:[
+    {lbl:'B — is home to the world\'s oldest surviving library', text:'Не підходить жодному місту. Є типовою пасткою для Byblos через зв\'язок з книгами і писемністю, або для Athens через філософію і науку.'},
+    {lbl:'C — is where the first paper money in history was used', text:'Не підходить жодному місту. Може виглядати правдоподібно для Aleppo через торговельний контекст, але в тексті про гроші не йдеться.'}
+  ]
+};
+
+const T4_CORRECT = {1:'D',2:'G',3:'A',4:'H',5:'B',6:'E'};
+const T4_OPTS = {A:'interested in preserving their cultural history',B:'manufactured by a machine in a distant country',C:'while they were becoming harder to sell online',D:'living in a world full of artificial plastic',E:'despite being a lot more expensive',F:'that are usually preferred by large companies',G:'than anything found in a standard supermarket',H:'although learning these crafts takes time'};
+const T4_EXP = [
+  {n:17,correct:'D — living in a world full of artificial plastic', exp:'Пропуск стоїть після завершеного речення про споживачів. "Living in a world full of artificial plastic" — participle clause, що додає контекст і пояснює їхній вибір натуральних матеріалів.'},
+  {n:18,correct:'G — than anything found in a standard supermarket', exp:'Після "significantly better" граматично необхідна конструкція з "than". "Anything found in a standard supermarket" = масові фабричні товари.'},
+  {n:19,correct:'A — interested in preserving their cultural history', exp:'Між підметом "many young artists" і присудком "are returning" потрібна participle clause або relative clause, що характеризує підмет. "Interested in preserving their cultural history" пояснює мотивацію.'},
+  {n:20,correct:'H — although learning these crafts takes time', exp:'"Although" вводить контраст — попри те що навчитись важко, люди все одно вважають це розслаблюючим. <strong>Зверни увагу:</strong> цей абзац повністю присвячений навичкам і процесу навчання ремеслу — тому саме тут логічно говорити про час і складність опанування. Не плутай з пропуском 22, де мова йде про ціну.'},
+  {n:21,correct:'B — manufactured by a machine in a distant country', exp:'Після "a boring object" потрібна частина речення, що характеризує цей об\'єкт. "Manufactured by a machine in a distant country" = масово вироблений товар, протилежність унікальній handmade речі.'},
+  {n:22,correct:'E — despite being a lot more expensive', exp:'Пропуск стоїть на початку речення. "Despite being a lot more expensive" вводить контраст у фінальному абзаці — попри вищу ціну, handmade товари є більш сталим способом життя. <strong>Зверни увагу:</strong> тут мова про вартість і вплив на довкілля, а не про процес навчання — тому саме тут стоїть E, а не H.'},
+  {distractors:[
+    {lbl:'C — while they were becoming harder to sell online', text:'Граматично може здатись підходящим, але суперечить тексту — текст говорить про зростання популярності ремесел, а не про труднощі з продажем.'},
+    {lbl:'F — that are usually preferred by large companies', text:'Може виглядати правдоподібно, але суперечить тону тексту — великі компанії асоціюються з масовим виробництвом.'}
+  ]}
+];
+
+const T5_CORRECT = {1:'A',2:'A',3:'A',4:'A',5:'A'};
+const T5_OPTS = {
+  1:{A:'did',B:'made',C:'set',D:'caught'},
+  2:{A:'with',B:'at',C:'off',D:'about'},
+  3:{A:'corridor',B:'hole',C:'tunnel',D:'room'},
+  4:{A:'carry out',B:'carry away',C:'carry on',D:'carry over'},
+  5:{A:'last',B:'least',C:'once',D:'first'}
+};
+const T5_EXP = [
+  {n:23,correct:'B — made', exp:'<strong>Made a breakthrough</strong> — сталий вираз, що означає досягти важливого відкриття. <strong>B) did</strong> — неіснуюча колокація. <strong>C) set</strong> — неіснуюча колокація. <strong>D) caught</strong> — неіснуюча колокація.'},
+  {n:24,correct:'A — with', exp:'<strong>Deal with</strong> — сталий вираз, що означає справлятись з чимось. <strong>B) at, C) off, D) about</strong> — жоден не вживається з "deal" у цьому значенні.'},
+  {n:25,correct:'C — tunnel', exp:'<strong>Light at the end of the tunnel</strong> — ідіома, що означає надію після тривалого періоду труднощів. <strong>B) corridor, C) hole, D) room</strong> — граматично можуть здатись підходящими, але ідіома існує лише з "tunnel".'},
+  {n:26,correct:'A — carry out', exp:'<strong>Carry out</strong> = виконувати, здійснювати — єдиний варіант, що природно поєднується з "procedure". <strong>B) carry away</strong> = забрати або захопити. <strong>C) carry on</strong> = продовжувати. <strong>D) carry over</strong> = переносити на інший час.'},
+  {n:27,correct:'D — first', exp:'<strong>At first</strong> = спочатку — вказує на початковий скептицизм, що змінився пізніше. <strong>B) at last</strong> = нарешті. <strong>C) at least</strong> = принаймні. <strong>D) at once</strong> = одразу, негайно.'}
+];
+
+const T6_CORRECT = {1:'A',2:'A',3:'A',4:'A',5:'A'};
+const T6_OPTS = {
+  1:{A:'19th',B:'the 19',C:'the 19s',D:'the 19th'},
+  2:{A:'designing',B:'designed',C:'designs',D:'was designed'},
+  3:{A:'300 metres tall',B:'300-metres-tall',C:'300-meter-tall',D:'300 of meters tall'},
+  4:{A:'interest',B:'interesting',C:'interested',D:'interestingly'},
+  5:{A:'greatest',B:'greater',C:'most great',D:'the greatest'}
+};
+const T6_EXP = [
+  {n:28,correct:'D — the 19th', exp:'Після "in" і перед "century" потрібен порядковий числівник з артиклем. <strong>B) 19th</strong> без артикля — граматично неповно після "in". <strong>C) the 19</strong> — без порядкового суфікса неіснуюча форма. <strong>D) the 19s</strong> — форма десятиліття, яка завжди закінчується на 0 (the 1990s, the 1880s), а не форма для позначення століття.'},
+  {n:29,correct:'B — designed', exp:'Речення вже має підмет "the tower" і присудок "was created" — між ними потрібна participle clause. "Designed by Gustave Eiffel" — Participle II, пасивний, описує вежу. <strong>B) designing</strong> — активний, але вежа не може сама себе проектувати. <strong>C) designs</strong> — Present Simple, другий присудок. <strong>D) was designed</strong> — ще один присудок, робить речення граматично надлишковим.'},
+  {n:30,correct:'A — 300 metres tall', exp:'Після "standing over" потрібна прислівникова фраза без дефісу. <strong>B) 300-metres-tall</strong> — неправильна форма, бо "metres" має бути в однині в compound adjective: 300-metre-tall. <strong>C) 300-meter-tall</strong> — compound adjective підходить лише перед іменником: <em>a 300-metre-tall tower</em>. <strong>D) 300 of meters tall</strong> — неіснуюча форма.'},
+  {n:31,correct:'C — interested', exp:'Після "are" потрібен прикметник. <strong>Interested in</strong> = зацікавлений чимось — сталий вираз з прийменником "in". <strong>B) interest</strong> — іменник або дієслово. <strong>C) interesting</strong> — означає "цікавий" (про об\'єкт), а не "зацікавлений" (про людину). <strong>D) interestingly</strong> — прислівник.'},
+  {n:32,correct:'A — greatest', exp:'Після "one of" завжди вживається найвищий ступінь порівняння у множині. <strong>B) greater</strong> — вищий ступінь. <strong>C) most great</strong> — неправильна форма для односкладового прикметника. <strong>D) the greatest</strong> — зайвий артикль, бо присвійний відмінок "city\'s" вже виконує цю функцію.'}
+];
+
+// ===== STATE =====
+let elapsed=0, timerInt=null, finalElapsed=0;
+let t1ans={}, t2ans={}, t3ans={}, t4ans={}, t5ans={}, t6ans={};
+let t2current=0;
+
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+
+function startTest(){
+  elapsed=0;
+  timerInt=setInterval(()=>{elapsed++;document.getElementById('timerDisplay').textContent=fmt(elapsed);},1000);
+  goTo('sTask1');
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const labels={sTask1:'Task 1',sTask2:'Task 2',sTask3:'Task 3',sTask4:'Task 4',sTask5:'Task 5',sTask6:'Task 6',sResults:'Результати'};
+  document.getElementById('screenLbl').textContent=labels[id]||'';
+  if(id==='sTask2') renderT2();
+}
+
+// TASK 1
+function t1pick(n,sel){
+  if(sel.value){t1ans[n]=sel.value;sel.classList.add('answered');}
+  else{delete t1ans[n];sel.classList.remove('answered');}
+  updateUsed('t1',t1ans,5);
+}
+function updateUsed(prefix,ans,total){
+  const used=Object.values(ans);
+  ['A','B','C','D','E','F','G','H'].forEach(l=>{
+    const el=document.getElementById(prefix+'o-'+l);
+    if(el){el.classList.toggle('used',used.includes(l));}
+  });
+  const count=Object.keys(ans).length;
+  const ctr=document.getElementById(prefix+'counter');
+  if(ctr)ctr.textContent=`Відповіді: ${count} / ${total}`;
+  const btn=document.getElementById(prefix+'btn');
+  const hint=document.getElementById(prefix+'hint');
+  if(btn){btn.disabled=count<total;}
+  if(hint){hint.textContent=count>=total?'Готово! Переходимо далі.':`Оберіть відповідь для кожного пункту`;}
+}
+
+// TASK 2
+function renderT2(){
+  document.getElementById('t2counter').textContent=`Відповіді: ${Object.keys(t2ans).length} / 5`;
+  const panel=document.getElementById('t2panel');
+  panel.innerHTML=T2_QUESTIONS.map((q,i)=>{
+    const sel=t2ans[i];
+    return `<div class="q-block" id="t2qb${i}">
+      <div class="q-num-lbl">Питання ${q.n}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${Object.entries(q.opts).map(([k,v])=>`
+          <button class="q-opt${sel===k?' selected':''}" onclick="t2pick(${i},'${k}')">
+            <span class="q-opt-letter" style="${sel===k?'background:var(--red);border-color:var(--red);color:#fff;':''}">${k.toUpperCase()}</span>
+            <span>${v}</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  // Show/hide next button
+  const allDone=Object.keys(t2ans).length===5;
+  let btnRow=document.getElementById('t2btnrow');
+  if(!btnRow){
+    btnRow=document.createElement('div');
+    btnRow.id='t2btnrow';
+    btnRow.style='margin-top:1rem';
+    panel.appendChild(btnRow);
+  }
+  btnRow.innerHTML=allDone?`<button class="btn-next" onclick="goTo('sTask3')">Перейти до Task 3 →</button>`:'';
+}
+function t2pick(i,k){
+  t2ans[i]=k;
+  renderT2();
+}
+
+// TASK 3
+function t3pick(n,sel){
+  if(sel.value){t3ans[n]=sel.value;sel.classList.add('answered');}
+  else{delete t3ans[n];sel.classList.remove('answered');}
+  updateUsed('t3',t3ans,6);
+}
+
+// TASK 4
+function t4pick(n,correct,sel){
+  if(sel.value){t4ans[n]=sel.value;sel.classList.add('answered');}
+  else{delete t4ans[n];sel.classList.remove('answered');}
+  const used=Object.values(t4ans);
+  ['A','B','C','D','E','F','G','H'].forEach(l=>{
+    const el=document.getElementById('t4o-'+l);
+    if(el)el.classList.toggle('used',used.includes(l));
+  });
+  const count=Object.keys(t4ans).length;
+  document.getElementById('t4counter').textContent=`Відповіді: ${count} / 6`;
+  document.getElementById('t4btn').disabled=count<6;
+  document.getElementById('t4hint').textContent=count>=6?'Готово!':'Заповніть усі 6 пропусків';
+}
+
+// TASK 5 & 6
+function gapPick(task,n,sel){
+  const ans=task==='t5'?t5ans:t6ans;
+  if(sel.value){ans[n]=sel.value;sel.classList.add('answered');}
+  else{delete ans[n];sel.classList.remove('answered');}
+  const count=Object.keys(ans).length;
+  const total=5;
+  document.getElementById(task+'counter').textContent=`Відповіді: ${count} / ${total}`;
+  document.getElementById(task+'btn').disabled=count<total;
+  document.getElementById(task+'hint').textContent=count>=total?'Готово!':'Заповніть усі 5 пропусків';
+}
+
+// RESULTS
+function showResults(){
+  clearInterval(timerInt);
+  finalElapsed=elapsed;
+  // scores
+  let s1=0,s2=0,s3=0,s4=0,s5=0,s6=0;
+  for(let i=1;i<=5;i++)if(t1ans[i]===T1_CORRECT[i])s1++;
+  for(let i=0;i<5;i++)if(t2ans[i]===T2_QUESTIONS[i].correct)s2++;
+  for(let i=1;i<=6;i++)if(t3ans[i]===T3_CORRECT[i])s3++;
+  for(let i=1;i<=6;i++)if(t4ans[i]===T4_CORRECT[i])s4++;
+  const T5C={1:'B',2:'A',3:'C',4:'A',5:'D'};
+  const T6C={1:'D',2:'B',3:'A',4:'C',5:'A'};
+  for(let i=1;i<=5;i++)if(t5ans[i]===T5C[i])s5++;
+  for(let i=1;i<=5;i++)if(t6ans[i]===T6C[i])s6++;
+  const total=s1+s2+s3+s4+s5+s6;
+
+  document.getElementById('finalTime').textContent='Час: '+fmt(finalElapsed);
+  document.getElementById('totalScore').textContent=`${total}/32`;
+  document.getElementById('tasksGrid').innerHTML=[
+    {l:'Task 1',s:s1,m:5},{l:'Task 2',s:s2,m:5},{l:'Task 3',s:s3,m:6},
+    {l:'Task 4',s:s4,m:6},{l:'Task 5',s:s5,m:5},{l:'Task 6',s:s6,m:5}
+  ].map(t=>`<div class="task-score-card"><div class="ts-lbl">${t.l}</div><div class="ts-num">${t.s}</div><div class="ts-max">з ${t.m}</div></div>`).join('');
+
+  // Build explanations
+  let html='';
+
+  // T1
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 1 — Встановлення відповідності (реклами)</div>`;
+  for(let i=1;i<=5;i++){
+    const u=t1ans[i]||'—';const c=T1_CORRECT[i];const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">Реклама ${i} — ${ok?'Правильно':'Неправильно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${T1_LABELS[u]||'—'}</div><div class="exp-right">Правильна відповідь: ${T1_EXP[i].correct}</div>`:''}
+        <div class="exp-text">${T1_EXP[i].exp}</div>
+      </div></div>`;
+  }
+  html+=`<div class="distractor-box"><h4>🚨 Дистрактори</h4>${T1_EXP.distractors.map(d=>`<div class="d-item"><div class="d-lbl">${d.lbl}</div><div class="d-text">${d.text}</div></div>`).join('')}</div></div>`;
+
+  // T2
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 2 — Multiple Choice (Тутанхамон)</div>`;
+  for(let i=0;i<5;i++){
+    const q=T2_QUESTIONS[i];const u=t2ans[i]||'—';const c=q.correct;const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">Питання ${q.n} — ${ok?'Правильно':'Неправідно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${q.opts[u]||'—'}</div><div class="exp-right">Правильна відповідь: ${T2_EXP[i].correct}</div>`:''}
+        <div class="exp-text">${T2_EXP[i].exp}</div>
+      </div></div>`;
+  }
+  html+=`</div>`;
+
+  // T3
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 3 — Встановлення відповідності (стародавні міста)</div>`;
+  for(let i=1;i<=6;i++){
+    const u=t3ans[i]||'—';const c=T3_CORRECT[i];const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">${10+i}. ${T3_CITIES[i]} — ${ok?'Правильно':'Неправильно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${T3_OPTS[u]||'—'}</div><div class="exp-right">Правильна відповідь: ${T3_EXP[i].correct}</div>`:''}
+        <div class="exp-text">${T3_EXP[i].exp}</div>
+      </div></div>`;
+  }
+  html+=`<div class="distractor-box"><h4>🚨 Дистрактори</h4>${T3_EXP.distractors.map(d=>`<div class="d-item"><div class="d-lbl">${d.lbl}</div><div class="d-text">${d.text}</div></div>`).join('')}</div></div>`;
+
+  // T4
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 4 — Заповнення пропусків (ремесла)</div>`;
+  for(let i=0;i<6;i++){
+    const e=T4_EXP[i];if(!e.n)continue;
+    const u=t4ans[i+1]||'—';const c=T4_CORRECT[i+1];const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">Пропуск ${e.n} — ${ok?'Правильно':'Неправильно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${T4_OPTS[u]||'—'}</div><div class="exp-right">Правильна відповідь: ${e.correct}</div>`:''}
+        <div class="exp-text">${e.exp}</div>
+      </div></div>`;
+  }
+  const t4d=T4_EXP[6];
+  if(t4d&&t4d.distractors){html+=`<div class="distractor-box"><h4>🚨 Дистрактори</h4>${t4d.distractors.map(d=>`<div class="d-item"><div class="d-lbl">${d.lbl}</div><div class="d-text">${d.text}</div></div>`).join('')}</div>`;}
+  html+=`</div>`;
+
+  // T5
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 5 — Лексика (Medical Breakthrough)</div>`;
+  const T5CORRECT={1:'B',2:'A',3:'C',4:'A',5:'D'};
+  for(let i=0;i<5;i++){
+    const e=T5_EXP[i];const u=t5ans[i+1]||'—';const c=T5CORRECT[i+1];const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">Питання ${e.n} — ${ok?'Правильно':'Неправильно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${T5_OPTS[i+1][u]||'—'}</div><div class="exp-right">Правильна відповідь: ${e.correct}</div>`:''}
+        <div class="exp-text">${e.exp}</div>
+      </div></div>`;
+  }
+  html+=`</div>`;
+
+  // T6
+  html+=`<div class="exp-section"><div class="exp-section-title">Task 6 — Граматика (Eiffel Tower)</div>`;
+  const T6CORRECT={1:'D',2:'B',3:'A',4:'C',5:'A'};
+  for(let i=0;i<5;i++){
+    const e=T6_EXP[i];const u=t6ans[i+1]||'—';const c=T6CORRECT[i+1];const ok=u===c;
+    html+=`<div class="exp-item ${ok?'correct':'wrong'}">
+      <div class="exp-head"><div class="exp-icon ${ok?'correct':'wrong'}">${ok?'✓':'✗'}</div><div class="exp-verdict ${ok?'correct':'wrong'}">Питання ${e.n} — ${ok?'Правильно':'Неправильно'}</div></div>
+      <div class="exp-body">
+        ${!ok?`<div class="exp-user">Ваша відповідь: ${u}) ${T6_OPTS[i+1][u]||'—'}</div><div class="exp-right">Правильна відповідь: ${e.correct}</div>`:''}
+        <div class="exp-text">${e.exp}</div>
+      </div></div>`;
+  }
+  html+=`</div>`;
+
+  document.getElementById('allExp').innerHTML=html;
+  goTo('sResults');
+}
+
+function restartTest(){
+  clearInterval(timerInt);
+  elapsed=0;t2current=0;
+  t1ans={};t2ans={};t3ans={};t4ans={};t5ans={};t6ans={};
+  document.querySelectorAll('select').forEach(s=>{s.value='';s.classList.remove('answered');});
+  document.querySelectorAll('.opt-tag').forEach(el=>el.classList.remove('used'));
+  document.getElementById('timerDisplay').textContent='00:00';
+  ['t1','t3','t4'].forEach(p=>{
+    const btn=document.getElementById(p+'btn');if(btn)btn.disabled=true;
+    const hint=document.getElementById(p+'hint');if(hint)hint.textContent='Оберіть відповідь для кожного пункту';
+    const ctr=document.getElementById(p+'counter');if(ctr)ctr.textContent=`Відповіді: 0 / ${p==='t1'?5:6}`;
+  });
+  ['t5','t6'].forEach(p=>{
+    const btn=document.getElementById(p+'btn');if(btn)btn.disabled=true;
+    const hint=document.getElementById(p+'hint');if(hint)hint.textContent='Заповніть усі 5 пропусків';
+    const ctr=document.getElementById(p+'counter');if(ctr)ctr.textContent='Відповіді: 0 / 5';
+  });
+  goTo('sStart');
+}
+</script>
+</div></body>
+</html>

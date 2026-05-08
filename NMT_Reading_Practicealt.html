@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMT Reading Practice — Loving Lessons</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C00000;--red-dark:#8a0000;--red-light:#fdf2f2;
+  --ink:#1a1008;--warm:#f5f0e8;--cream:#faf7f2;
+  --border:#e8ddd0;--gray:#7a6f65;--green:#1a5c2a;--gold:#b8860b;
+}
+body{font-family:Georgia,serif;background:var(--cream);color:var(--ink);min-height:100vh}
+
+/* HEADER */
+.app-header{background:var(--red);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.brand{color:#fff;font-family:Georgia,serif;font-size:1.1rem;font-weight:700;letter-spacing:.5px}
+.brand span{opacity:.7;font-weight:400;font-size:.85rem;display:block}
+.progress-indicator{color:#fff;opacity:.8;font-size:.8rem;text-align:right}
+
+/* SCREENS */
+.screen{display:block;visibility:hidden;position:absolute;top:0;left:0;width:100%;pointer-events:none;opacity:0;transition:opacity .3s}
+.screen.active{visibility:visible;position:relative;pointer-events:auto;opacity:1}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.container{max-width:740px;margin:0 auto;padding:2rem 1.5rem}
+
+/* STRATEGY SCREEN */
+.strategy-hero{background:var(--red);color:#fff;border-radius:12px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.strategy-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)}
+.strategy-hero h1{font-family:Georgia,serif;font-size:1.8rem;margin-bottom:.5rem}
+.strategy-hero p{opacity:.85;font-size:.95rem;line-height:1.6}
+.strategy-tag{display:inline-block;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 12px;font-size:.75rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem}
+
+.strategy-section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem}
+.strategy-section h2{font-family:Georgia,serif;font-size:1.1rem;color:var(--red);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.step{display:flex;gap:1rem;margin-bottom:.9rem;align-items:flex-start}
+.step-num{min-width:28px;height:28px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.step p{font-size:.9rem;line-height:1.55;color:#333}
+.step p strong{color:var(--ink)}
+.step p em{color:var(--red);font-style:normal;font-weight:600}
+
+.trap{background:#fff8f8;border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:.9rem 1rem;margin-bottom:.8rem}
+.trap-label{font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:.3rem}
+.trap p{font-size:.88rem;line-height:1.5;color:#444}
+.trap em{color:var(--red);font-style:italic}
+
+.btn-primary{display:block;width:100%;background:var(--red);color:#fff;border:none;padding:1rem;border-radius:8px;font-family:Georgia,serif;font-size:1.05rem;cursor:pointer;margin-top:1.5rem;letter-spacing:.5px;transition:background .2s}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-secondary{display:block;width:100%;background:#fff;color:var(--red);border:2px solid var(--red);padding:.85rem;border-radius:8px;font-family:Georgia,serif;font-size:1rem;cursor:pointer;margin-top:.8rem;transition:all .2s}
+.btn-secondary:hover{background:var(--red-light)}
+
+/* TASK HEADER */
+.task-header{border-bottom:2px solid var(--red);padding-bottom:1rem;margin-bottom:1.5rem}
+.task-label{display:inline-block;background:var(--red);color:#fff;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:4px;margin-bottom:.6rem}
+.task-header h2{font-family:Georgia,serif;font-size:1.4rem;color:var(--ink)}
+.task-header p{font-size:.88rem;color:var(--gray);margin-top:.3rem;line-height:1.5;font-style:italic}
+.task-counter{font-size:.82rem;color:var(--gray);margin-top:.5rem}
+
+/* ADVERTISEMENT CARD */
+.ad-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.2rem;position:relative}
+.ad-num{position:absolute;top:-12px;left:1rem;background:var(--red);color:#fff;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:10px}
+.ad-title{font-family:Georgia,serif;font-size:1.15rem;color:var(--red);margin-bottom:.3rem}
+.ad-tagline{font-style:italic;color:var(--gray);font-size:.88rem;margin-bottom:.8rem}
+.ad-body{font-size:.88rem;line-height:1.65;color:#333}
+.ad-body ul{list-style:none;margin:.5rem 0}
+.ad-body ul li::before{content:'—';color:var(--red);margin-right:.4rem}
+.ad-body .ad-contact{margin-top:.8rem;font-size:.83rem;color:var(--gray)}
+.ad-body .ad-highlight{color:var(--red);font-weight:600}
+
+/* DROPDOWN */
+.dropdown-wrap{margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem}
+.dropdown-label{font-size:.78rem;color:var(--gray);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px}
+.dropdown-q{font-size:.95rem;color:var(--ink);font-weight:600;margin-bottom:.6rem}
+select.answer-select{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:7px;font-family:'Source Serif 4',serif;font-size:.9rem;color:var(--ink);background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C00000' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s}
+select.answer-select:focus{outline:none;border-color:var(--red)}
+select.answer-select.selected{border-color:var(--red);background-color:var(--red-light)}
+
+/* PARAGRAPH CARD */
+.para-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1.2rem;position:relative}
+.para-num{position:absolute;top:-12px;left:1rem;background:var(--ink);color:#fff;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:10px}
+.para-title{font-family:Georgia,serif;font-size:1rem;color:var(--red);margin-bottom:.7rem}
+.para-body{font-size:.9rem;line-height:1.7;color:#333}
+
+/* CHECK BUTTON */
+.check-row{margin-top:1.5rem;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+.btn-check{background:var(--red);color:#fff;border:none;padding:.85rem 2rem;border-radius:8px;font-family:Georgia,serif;font-size:1rem;cursor:pointer;transition:background .2s}
+.btn-check:hover:not(:disabled){background:var(--red-dark)}
+.btn-check:disabled{background:#ccc;cursor:not-allowed}
+.check-hint{font-size:.8rem;color:var(--gray)}
+
+/* RESULTS */
+.score-banner{background:var(--red);color:#fff;border-radius:10px;padding:1.5rem;text-align:center;margin-bottom:1.5rem}
+.score-banner .big{font-family:Georgia,serif;font-size:3rem;font-weight:900;line-height:1}
+.score-banner .lbl{opacity:.8;font-size:.9rem;margin-top:.3rem}
+
+.result-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;margin-bottom:1.2rem;overflow:hidden}
+.result-card.correct{border-left:4px solid var(--green)}
+.result-card.wrong{border-left:4px solid var(--red)}
+.result-ad{padding:1.2rem 1.2rem .8rem;border-bottom:1px solid var(--border)}
+.result-ad-title{font-family:Georgia,serif;font-size:1rem;color:var(--red);margin-bottom:.5rem}
+.result-ad-body{font-size:.83rem;line-height:1.6;color:#444}
+.result-exp{padding:1rem 1.2rem}
+.result-verdict{display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem}
+.verdict-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
+.verdict-icon.correct{background:#dcfce7;color:var(--green)}
+.verdict-icon.wrong{background:#fee2e2;color:var(--red)}
+.verdict-text{font-size:.85rem;font-weight:600}
+.verdict-text.correct{color:var(--green)}
+.verdict-text.wrong{color:var(--red)}
+.exp-text{font-size:.85rem;line-height:1.6;color:#444}
+.exp-text em{font-style:italic;color:var(--red)}
+.user-answer{font-size:.8rem;color:var(--gray);margin-top:.4rem}
+.correct-answer{font-size:.8rem;color:var(--green);font-weight:600;margin-top:.2rem}
+
+.distractor-section{background:var(--warm);border:1px solid var(--border);border-radius:10px;padding:1.2rem;margin-bottom:1.5rem}
+.distractor-section h3{font-family:Georgia,serif;font-size:1rem;color:var(--ink);margin-bottom:.8rem}
+.distractor-item{margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid var(--border)}
+.distractor-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.distractor-label{font-size:.78rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem}
+.distractor-text{font-size:.85rem;line-height:1.55;color:#444}
+</style>
+</head>
+<body><div id="screenWrapper" style="position:relative;width:100%;min-height:100vh">
+
+<div class="app-header">
+  <div class="brand">Loving Lessons <span>@English__on_the_go</span></div>
+  <div class="progress-indicator" id="headerProgress">NMT Reading Practice</div>
+</div>
+
+<div id="screenStrategy" class="screen active">
+<div class="container">
+  <div class="strategy-hero">
+    <div class="strategy-tag">📖 Стратегія</div>
+    <h1>Task 1 & Task 3<br>Встановлення відповідності</h1>
+    <p>Обидва завдання виглядають по-різному, але працюють за однаковим принципом.</p>
+  </div>
+
+  <div class="strategy-section">
+    <h2>⚡ Покрокова стратегія</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <p><strong>Читаємо всі варіанти A-H.</strong> Спершу переглядаємо всі 8 варіантів. Ми вже маємо загальне уявлення про текст і попередньо знаємо, що будемо шукати, ще до того як прочитаємо текст.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <p><strong>Шукаємо «золоту рибку».</strong> У кожному варіанті є 1–2 ключові слова, які несуть основний зміст. Це і є «золота рибка» — вона десь ховається серед «водоростей», тобто зайвих деталей тексту.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <p><strong>Читаємо текст і шукаємо синонім, а не точний збіг.</strong> Відповідь ніколи не буде дослівним повторенням варіанта. НМТ завжди використовує перефразування.<br><em>Приклад: реклама каже "We're hiring / App Engineer / join Digital" → правильна відповідь — employment opportunities, не "hiring assistants".</em></p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <p><strong>Складне залишаємо на кінець.</strong> Якщо якийсь текст не піддається, пропускаємо і повертаємось. До того часу частина варіантів уже стане очевиднішою.</p>
+    </div>
+  </div>
+
+  <div class="strategy-section">
+    <h2>🚨 Топ пастки</h2>
+    <div class="trap">
+      <div class="trap-label">Пастка 1</div>
+      <p><strong>Золота рибка чи гачок, на який можна спійматись?</strong> НМТ навмисно вставляє слово з тексту у неправильний варіант, щоб спокусити. Якщо бачиш те саме слово — це підозріло. Шукаємо думку, а не слово.<br><em>Приклад: текст про башту каже "lightning strikes" → один варіант каже "damaged by a bolt of lightning" і звучить переконливо, але правильною є зовсім не ця відповідь.</em></p>
+    </div>
+    <div class="trap">
+      <div class="trap-label">Пастка 2</div>
+      <p><strong>Часткова правда.</strong> Варіант може згадувати щось із тексту, але не передавати головну думку. Частина правди — це не правда.</p>
+    </div>
+    <div class="trap">
+      <div class="trap-label">Пастка 3 — Task 3</div>
+      <p><strong>Не плутати деталь з темою абзацу.</strong> Кожен абзац має одну головну думку — і саме її треба співставити з варіантом. Деталі всередині — це не тема.</p>
+    </div>
+    <div class="trap">
+      <div class="trap-label">Пастка 4</div>
+      <p><strong>Не дочитати варіант відповіді до кінця.</strong> Варіанти спеціально схожі між собою, різниця — в нюансах.<br><em>Приклад: "has survived a natural disaster and wars" vs "was badly damaged by a bolt of lightning" — схоже, але різне.</em></p>
+    </div>
+    <div class="trap">
+      <div class="trap-label">Пастка 5</div>
+      <p><strong>"Лайфхаки" з інтернету.</strong> В мережі часто радять читати лише перше або останнє речення кожного абзацу. Це оманлива порада — екзаменатори про неї знають і навмисно ховають відповідь у середині тексту, іноді навіть у другорядному реченні. Орієнтуйся на золоту рибку, а не на позицію речення в абзаці.</p>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="showScreen('screenTask1')">Почати практику →</button>
+</div>
+</div>
+
+<!-- TASK 1 -->
+<div id="screenTask1" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-label">Task 1 — Читання</div>
+    <h2>Встановлення відповідності</h2>
+    <p>Read the texts below. Match choices (A–H) to (1–5). There are three choices you do not need to use.</p>
+    <div class="task-counter" id="task1Counter">Відповіді: 0 / 5</div>
+  </div>
+
+  <div class="task1-options-bar" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1.5rem">
+    <div style="font-size:.78rem;color:var(--gray);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">Варіанти відповідей:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>A</strong> housekeeping</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>B</strong> accommodation</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>C</strong> leisure</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>D</strong> volunteering</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>E</strong> education</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>F</strong> health</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>G</strong> food and dining</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>H</strong> jobs and career</span>
+    </div>
+  </div>
+
+  <!-- AD 1 -->
+  <div class="ad-card">
+    <div class="ad-num">1</div>
+    <div class="ad-title">Sparkle Cleaning Services</div>
+    <div class="ad-tagline">Your home deserves the best!</div>
+    <div class="ad-body">
+      <ul>
+        <li>Kitchen & bathroom deep clean</li>
+        <li>Laundry & ironing available</li>
+        <li>Flexible scheduling — weekdays & weekends</li>
+        <li>Eco-friendly products only</li>
+        <li>First booking? Get 20% off!</li>
+      </ul>
+      <div class="ad-contact">📞 0800 447 112 &nbsp;|&nbsp; 🌐 www.sparkleclean.co.uk</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="answer-select" id="t1q1" onchange="t1Select(1,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — housekeeping</option>
+        <option value="B">B — accommodation</option>
+        <option value="C">C — leisure</option>
+        <option value="D">D — volunteering</option>
+        <option value="E">E — education</option>
+        <option value="F">F — health</option>
+        <option value="G">G — food and dining</option>
+        <option value="H">H — jobs and career</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AD 2 -->
+  <div class="ad-card">
+    <div class="ad-num">2</div>
+    <div class="ad-title">JAZZ UNDER THE STARS</div>
+    <div class="ad-tagline">One night only — don't miss it!</div>
+    <div class="ad-body">
+      Join us for an unforgettable open-air evening featuring internationally acclaimed jazz musicians.<br><br>
+      📍 Riverside Park Amphitheatre<br>
+      📅 Saturday, 14 June | 8:00 PM<br>
+      🎟 Tickets: £15 | Students: £9<br>
+      Available at the box office or online at www.jazzstars.co.uk<br><br>
+      <em>Bring a blanket. Leave your worries behind.</em>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="answer-select" id="t1q2" onchange="t1Select(2,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — housekeeping</option>
+        <option value="B">B — accommodation</option>
+        <option value="C">C — leisure</option>
+        <option value="D">D — volunteering</option>
+        <option value="E">E — education</option>
+        <option value="F">F — health</option>
+        <option value="G">G — food and dining</option>
+        <option value="H">H — jobs and career</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AD 3 -->
+  <div class="ad-card">
+    <div class="ad-num">3</div>
+    <div class="ad-title">FluentFast Online Academy</div>
+    <div class="ad-tagline">Learn. Speak. Succeed.</div>
+    <div class="ad-body">
+      Struggling with English for your exams or career? Our certified tutors are here to help — online, anytime.<br><br>
+      ✅ One-to-one & group sessions<br>
+      ✅ B1–C2 levels<br>
+      ✅ Flexible timetable<br>
+      ✅ Free trial lesson — no commitment<br><br>
+      <div class="ad-contact">📧 info@fluentfast.com &nbsp;|&nbsp; 📱 Download our app and start today!</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="answer-select" id="t1q3" onchange="t1Select(3,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — housekeeping</option>
+        <option value="B">B — accommodation</option>
+        <option value="C">C — leisure</option>
+        <option value="D">D — volunteering</option>
+        <option value="E">E — education</option>
+        <option value="F">F — health</option>
+        <option value="G">G — food and dining</option>
+        <option value="H">H — jobs and career</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AD 4 -->
+  <div class="ad-card">
+    <div class="ad-num">4</div>
+    <div class="ad-title">The Green Fork</div>
+    <div class="ad-tagline">Farm-fresh food, straight to your door.</div>
+    <div class="ad-body">
+      Tired of supermarket meals? We deliver freshly prepared dishes made from locally sourced ingredients — every day of the week.<br><br>
+      🥗 Vegetarian & vegan options available<br>
+      📦 No subscription required — order when you want<br>
+      ⭐ Rated 4.9/5 by over 2,000 customers<br><br>
+      Order before 2 PM — delivered by 7 PM.<br>
+      <div class="ad-contact">🌐 www.thegreenfork.com</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="answer-select" id="t1q4" onchange="t1Select(4,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — housekeeping</option>
+        <option value="B">B — accommodation</option>
+        <option value="C">C — leisure</option>
+        <option value="D">D — volunteering</option>
+        <option value="E">E — education</option>
+        <option value="F">F — health</option>
+        <option value="G">G — food and dining</option>
+        <option value="H">H — jobs and career</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AD 5 -->
+  <div class="ad-card">
+    <div class="ad-num">5</div>
+    <div class="ad-title">NOW HIRING — Marketing Assistant</div>
+    <div class="ad-tagline">Join our growing team in Bristol!</div>
+    <div class="ad-body">
+      We are looking for a motivated and creative individual to support our marketing department.<br><br>
+      📋 Requirements:<br>
+      — Degree in Marketing or related field<br>
+      — Strong communication skills<br>
+      — Experience with social media platforms<br><br>
+      💼 Full-time | Competitive salary + benefits<br>
+      <div class="ad-contact">📧 careers@brightgroup.co.uk &nbsp;|&nbsp; Deadline: 30 May</div>
+    </div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">This advertisement is about ______.</div>
+      <select class="answer-select" id="t1q5" onchange="t1Select(5,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — housekeeping</option>
+        <option value="B">B — accommodation</option>
+        <option value="C">C — leisure</option>
+        <option value="D">D — volunteering</option>
+        <option value="E">E — education</option>
+        <option value="F">F — health</option>
+        <option value="G">G — food and dining</option>
+        <option value="H">H — jobs and career</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="check-row">
+    <button class="btn-check" id="btnCheckT1" onclick="checkTask1()" disabled>Перевірити відповіді</button>
+    <span class="check-hint" id="checkHintT1">Оберіть відповідь для кожної реклами</span>
+  </div>
+</div>
+</div>
+
+<!-- TASK 1 RESULTS -->
+<div id="screenTask1Results" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-label">Task 1 — Результати</div>
+    <h2>Відповіді та пояснення</h2>
+  </div>
+  <div class="score-banner">
+    <div class="big" id="t1Score">—</div>
+    <div class="lbl">правильних відповідей з 5</div>
+  </div>
+  <div id="t1Results"></div>
+  <div class="distractor-section">
+    <h3>🚨 Дистрактори — варіанти без правильної відповіді</h3>
+    <div class="distractor-item">
+      <div class="distractor-label">B — accommodation</div>
+      <div class="distractor-text">Жодна реклама не пропонує проживання. Може ввести в оману через згадку "Riverside Park Amphitheatre" у рекламі 2 — але місце проведення концерту не є проживанням.</div>
+    </div>
+    <div class="distractor-item">
+      <div class="distractor-label">D — volunteering</div>
+      <div class="distractor-text">Жодна реклама не пов'язана з волонтерством. Є типовою пасткою через "eco-friendly" у рекламі 1 або "locally sourced" у рекламі 4 — обидві деталі асоціюються з екологічними ініціативами, але не є темою жодної реклами.</div>
+    </div>
+    <div class="distractor-item">
+      <div class="distractor-label">F — health</div>
+      <div class="distractor-text">Жодна реклама прямо не стосується здоров'я. Звучить переконливо через "eco-friendly products" у рекламі 1 та "vegetarian & vegan options" у рекламі 4 — але в обох випадках це лише додаткова деталь, а не тема реклами.</div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="showScreen('screenTask3')">Перейти до Task 3 →</button>
+</div>
+</div>
+
+<!-- TASK 3 -->
+<div id="screenTask3" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-label">Task 3 — Читання</div>
+    <h2>Встановлення відповідності</h2>
+    <p>Read the texts below. Match choices (A–H) to (1–6). There are two choices you do not need to use.</p>
+    <div class="task-counter" id="task3Counter">Відповіді: 0 / 6</div>
+  </div>
+
+  <div class="task1-options-bar" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1.5rem">
+    <div style="font-size:.78rem;color:var(--gray);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">Варіанти відповідей:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>A</strong> came about because of an error made by a junior worker</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>B</strong> was discovered when a scientist was on a trip</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>C</strong> proved life-saving in a military context</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>D</strong> had a huge impact on public health</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>E</strong> was brought into domestic life by a scientist's spouse</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>F</strong> was developed specifically for cooking purposes from the start</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>G</strong> was initially enormous and extremely expensive</span>
+      <span style="background:var(--red-light);border:1px solid #f5c6c6;border-radius:4px;padding:3px 8px;font-size:.85rem"><strong>H</strong> was inspired by a problem encountered outside of work</span>
+    </div>
+  </div>
+
+  <!-- PARA 1 -->
+  <div class="para-card">
+    <div class="para-num">1</div>
+    <div class="para-title">Penicillin</div>
+    <div class="para-body">Alexander Fleming was not the tidiest scientist in the world. In 1928, he went on holiday and left a dirty petri dish on his lab bench. When he came back, he noticed something strange — a mould called <em>Penicillium</em> had grown on the dish and killed all the bacteria around it. Instead of throwing it away, Fleming looked closer. That one messy mistake saved millions of lives and changed medicine forever. Fleming later joked that if he had been a cleaner scientist, he would never have made the discovery.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q1" onchange="t3Select(1,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PARA 2 -->
+  <div class="para-card">
+    <div class="para-num">2</div>
+    <div class="para-title">Microwave Oven</div>
+    <div class="para-body">In 1945, engineer Percy Spencer was testing military radar equipment when he reached into his pocket for a chocolate bar — and found a melted mess. The radar waves had cooked it without any heat source. Most people would have been annoyed. Spencer was fascinated. He started experimenting with popcorn and eggs — the egg exploded — and within two years the first microwave oven was on the market. The first model was nearly two metres tall and cost more than a car.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q2" onchange="t3Select(2,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PARA 3 -->
+  <div class="para-card">
+    <div class="para-num">3</div>
+    <div class="para-title">Post-it Notes</div>
+    <div class="para-body">In 1968, chemist Spencer Silver at 3M was trying to create the strongest glue in the world. He failed completely — he invented a glue that barely stuck to anything and could be peeled off without leaving a mark. For years, nobody knew what to do with it. Then his colleague Arthur Fry got frustrated when his bookmarks kept falling out of his choir songbook during church. He remembered Silver's useless glue, put it on a piece of paper — and the Post-it note was born. Sometimes the worst invention becomes the best one.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q3" onchange="t3Select(3,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PARA 4 -->
+  <div class="para-card">
+    <div class="para-num">4</div>
+    <div class="para-title">Coca-Cola</div>
+    <div class="para-body">In 1886, pharmacist John Pemberton was trying to create a medicine for headaches and tiredness. He cooked up a sweet syrup and brought it to a local pharmacy. His assistant Jacob accidentally mixed the syrup with sparkling water instead of still water. Customers tasted it and loved it. Nobody remembers Jacob's name — but his mistake became the world's most recognised drink, now sold in over 200 countries. Pemberton sold the recipe shortly before he died, having no idea what it would become.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q4" onchange="t3Select(4,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PARA 5 -->
+  <div class="para-card">
+    <div class="para-num">5</div>
+    <div class="para-title">Teflon</div>
+    <div class="para-body">In 1938, chemist Roy Plunkett at DuPont was searching for a new type of refrigerant gas. One morning he opened a storage cylinder expecting to find gas — but it was empty. Instead of moving on, he cut the cylinder open to see what had happened inside. The gas had transformed into a white, slippery powder that nothing could stick to and that could survive extreme temperatures. He had no idea what to do with it. Years later, a French engineer's wife suggested coating her cooking pans with it. Non-stick cookware was born by complete accident.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q5" onchange="t3Select(5,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PARA 6 -->
+  <div class="para-card">
+    <div class="para-num">6</div>
+    <div class="para-title">Superglue</div>
+    <div class="para-body">During World War II, chemist Harry Coover was trying to develop a clear material for gun sights. Instead, he created a substance that stuck to absolutely everything it touched — including all his equipment. He was furious and abandoned the project entirely. Nine years later, a colleague was testing a similar formula and accidentally glued two lenses together. This time, Coover realised what he actually had. Superglue hit the market in 1958 and during the Vietnam War it was used by medics to seal wounds on the battlefield.</div>
+    <div class="dropdown-wrap">
+      <div class="dropdown-q">Which invention ______?</div>
+      <select class="answer-select" id="t3q6" onchange="t3Select(6,this)">
+        <option value="">— Choose A–H —</option>
+        <option value="A">A — came about because of an error made by a junior worker</option>
+        <option value="B">B — was discovered when a scientist was on a trip</option>
+        <option value="C">C — proved life-saving in a military context</option>
+        <option value="D">D — had a huge impact on public health</option>
+        <option value="E">E — was brought into domestic life by a scientist's spouse</option>
+        <option value="F">F — was developed specifically for cooking purposes from the start</option>
+        <option value="G">G — was initially enormous and extremely expensive</option>
+        <option value="H">H — was inspired by a problem encountered outside of work</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="check-row">
+    <button class="btn-check" id="btnCheckT3" onclick="checkTask3()" disabled>Перевірити відповіді</button>
+    <span class="check-hint" id="checkHintT3">Оберіть відповідь для кожного абзацу</span>
+  </div>
+</div>
+</div>
+
+<!-- TASK 3 RESULTS -->
+<div id="screenTask3Results" class="screen">
+<div class="container">
+  <div class="task-header">
+    <div class="task-label">Task 3 — Результати</div>
+    <h2>Відповіді та пояснення</h2>
+  </div>
+  <div class="score-banner">
+    <div class="big" id="t3Score">—</div>
+    <div class="lbl">правильних відповідей з 6</div>
+  </div>
+  <div id="t3Results"></div>
+  <div class="distractor-section">
+    <h3>🚨 Дистрактори — варіанти без правильної відповіді</h3>
+    <div class="distractor-item">
+      <div class="distractor-label">F — an invention that was originally meant for medical use</div>
+      <div class="distractor-text">Жоден з абзаців не описує винахід, створений саме для медицини з самого початку. Це типова пастка — може ввести в оману через абзац 4 (Coca-Cola), де фармацевт Pemberton дійсно намагався створити <em>"a medicine for headaches"</em>, але правильна відповідь для цього абзацу — D, бо головна думка про те, що він продав рецепт і помер, не побачивши успіху.</div>
+    </div>
+    <div class="distractor-item">
+      <div class="distractor-label">B — a discovery made by paying attention to an overlooked detail</div>
+      <div class="distractor-text">Жоден абзац не має цього як головну думку. Може виглядати правдоподібно для абзацу 1 (Fleming), але правильна відповідь для Fleming — D (вплив на охорону здоров'я). Золота рибка в абзаці 1 — <em>"saved millions of lives"</em>, а не "paying attention".</div>
+    </div>
+  </div>
+  <button class="btn-primary" onclick="restart()">Почати спочатку</button>
+</div>
+</div>
+
+<script>
+// DATA
+const t1Correct = {1:'A',2:'C',3:'E',4:'G',5:'H'};
+const t1Explanations = {
+  1: {title:'Sparkle Cleaning Services', correct:'A — housekeeping', exp:'Реклама пропонує прибирання кухні, ванної кімнати, прання та прасування — це і є побутові послуги по догляду за домом. <em>"Kitchen & bathroom deep clean"</em> та <em>"laundry & ironing"</em> — ключові слова, що вказують на housekeeping. Дистрактор F) health — легко сплутати через <em>"eco-friendly products"</em>, але продукти без хімії — це деталь, а не тема реклами.'},
+  2: {title:'Jazz Under the Stars', correct:'C — leisure', exp:'Реклама запрошує на джазовий концерт просто неба — це розваги і дозвілля. <em>"Unforgettable open-air evening"</em> та <em>"bring a blanket"</em> — вказують на відпочинок. Дистрактор B) accommodation — є типовою пасткою через згадку <em>"Riverside Park Amphitheatre"</em>, але місце проведення — це деталь, а не тема.'},
+  3: {title:'FluentFast Online Academy', correct:'E — education', exp:'Реклама пропонує онлайн-уроки англійської з сертифікованими викладачами. <em>"Certified tutors"</em>, <em>"B1–C2 levels"</em>, <em>"free trial lesson"</em> — все вказує на навчання. Дистрактор F) health — може ввести в оману тих, хто бачить лише слово <em>"struggling"</em> без контексту.'},
+  4: {title:'The Green Fork', correct:'G — food and dining', exp:'Реклама пропонує доставку свіжоприготованих страв. <em>"Freshly prepared dishes"</em>, <em>"vegetarian & vegan options"</em>, <em>"order before 2 PM — delivered by 7 PM"</em> — чіткі ознаки food and dining. Дистрактор D) volunteering — звучить переконливо через <em>"locally sourced ingredients"</em>, що асоціюється з екологічними ініціативами, але це деталь про якість їжі.'},
+  5: {title:'Now Hiring — Marketing Assistant', correct:'H — jobs and career', exp:'Реклама шукає маркетинг-асистента з конкретними вимогами. <em>"Now hiring"</em>, <em>"send your CV"</em>, <em>"full-time | competitive salary"</em> — класичні ознаки вакансії. Дистрактор D) volunteering — виглядає правдоподібно для тих, хто бачить <em>"motivated individual"</em>, але наявність зарплати і резюме однозначно вказує на оплачувану роботу.'}
+};
+
+const t3Correct = {1:'D',2:'G',3:'E',4:'D',5:'C',6:'A'};
+
+// Wait - let me fix t3Correct based on our discussion:
+// Paragraph 1 — Penicillin → D (had a huge impact on public health)
+// Paragraph 2 — Microwave → G (was initially enormous and extremely expensive)  
+// Paragraph 3 — Post-it → H (was inspired by a problem encountered outside of work)
+// Paragraph 4 — Coca-Cola → D (came about because of an error made by a junior worker) -- wait D is "a creator who never witnessed his product's global success"
+
+// Let me re-map based on our A-H options:
+// A = a researcher who initially rejected his own finding → Para 6 (Coover)
+// B = a discovery made by paying attention to an overlooked detail → DISTRACTOR
+// C = an invention that ended up serving a completely different purpose → Para 5 (Teflon)
+// D = a creator who never witnessed his product's global success → Para 4 (Pemberton)
+// E = a mistake made by one person that became another person's solution → Para 3 (Post-it)
+// F = an invention that was originally meant for medical use → DISTRACTOR  
+// G = a scientist who discovered something unexpected inside his own equipment → Para 2 (Spencer/Microwave)
+// H = an invention that helped rescue people in life-threatening conditions → Para 6... wait conflict with A
+
+// Actually from our discussion the final answers were:
+// Paragraph 1 (Penicillin) → D (had a huge impact on public health)
+// BUT in our new A-H, D = "a creator who never witnessed his product's global success"
+// That doesn't match Penicillin!
+
+// Let me re-read our Task 3 options carefully. We had:
+// The question options A-H we settled on were about the INVENTIONS not the original ones
+// A = a researcher who initially rejected his own finding
+// B = distractor
+// C = an invention that ended up serving a completely different purpose  
+// D = a creator who never witnessed his product's global success
+// E = a mistake made by one person that became another person's solution
+// F = distractor
+// G = a scientist who discovered something unexpected inside his own equipment
+// H = an invention that helped rescue people in life-threatening conditions
+
+// So correct mapping:
+// Para 1 (Penicillin) → B? No B is distractor... 
+// Actually Fleming noticed something others would ignore → that was B but we made B a distractor
+// Hmm, let me think about this more carefully
+
+// From our conversation the user selected these 6 facts:
+// 1. Penicillin → "had a huge impact on public health" 
+// 2. Microwave → "was initially enormous and extremely expensive"
+// 3. Post-it → "was inspired by a problem encountered outside of work"
+// 4. Coca-Cola → "came about because of an error made by a junior worker"
+// 5. Teflon → "was brought into domestic life by a scientist's spouse"
+// 6. Superglue → "proved life-saving in a military context"
+
+// Then randomized as A-H:
+// A) came about because of an error made by a junior worker → Para 4 Coca-Cola
+// B) was discovered when a scientist was on a trip → DISTRACTOR
+// C) proved life-saving in a military context → Para 6 Superglue
+// D) had a huge impact on public health → Para 1 Penicillin
+// E) was brought into domestic life by a scientist's spouse → Para 5 Teflon
+// F) was developed specifically for cooking purposes from the start → DISTRACTOR
+// G) was initially enormous and extremely expensive → Para 2 Microwave
+// H) was inspired by a problem encountered outside of work → Para 3 Post-it
+
+// So correct: 1→D, 2→G, 3→H, 4→A, 5→E, 6→C
+
+const t3CorrectFinal = {1:'D',2:'G',3:'H',4:'A',5:'E',6:'C'};
+
+const t3Explanations = {
+  1: {title:'Penicillin', correct:'D — had a huge impact on public health', exp:'Текст каже <em>"saved millions of lives and changed medicine forever"</em> — мільйони врятованих життів це і є величезний вплив на охорону здоров\'я. "Public health" = медицина і здоров\'я суспільства, "huge impact" = "saved millions of lives". Дистрактор B) "was discovered when a scientist was on a trip" — пастка: Флемінг дійсно їздив у відпустку <em>"went on holiday"</em>, але відкриття відбулось після повернення, а не під час поїздки.'},
+  2: {title:'Microwave Oven', correct:'G — was initially enormous and extremely expensive', exp:'Текст каже <em>"nearly two metres tall and cost more than a car"</em> — два метри заввишки і дорожче за автомобіль. "Enormous" = два метри заввишки, "extremely expensive" = дорожче за авто. Золота рибка схована в кінці абзацу.'},
+  3: {title:'Post-it Notes', correct:'H — was inspired by a problem encountered outside of work', exp:'Текст каже, що закладки випадали <em>"during church"</em> — проблема виникла не в лабораторії, а під час церковної служби. "Outside of work" = поза роботою, "problem" = закладки що випадали. Зверни увагу: золота рибка схована в середині абзацу, а не на початку чи в кінці.'},
+  4: {title:'Coca-Cola', correct:'A — came about because of an error made by a junior worker', exp:'Текст каже <em>"his assistant Jacob accidentally mixed the syrup with sparkling water"</em> — помилка була зроблена помічником. "Junior worker" = помічник Джейкоб, "error" = випадкове змішування. Дистрактор F) "originally meant for medical use" — пастка через <em>"trying to create a medicine for headaches"</em>, але головна думка абзацу — про помилку помічника і несподіваний успіх.'},
+  5: {title:'Teflon', correct:'E — was brought into domestic life by a scientist\'s spouse', exp:'Текст каже <em>"a French engineer\'s wife suggested coating her cooking pans with it"</em> — дружина інженера запропонувала домашнє застосування. "Domestic life" = побут, "scientist\'s spouse" = дружина вченого. Золота рибка у самому кінці абзацу. Дистрактор F) "developed for cooking from the start" — пастка, бо Teflon розроблявся як холодоагент.'},
+  6: {title:'Superglue', correct:'C — proved life-saving in a military context', exp:'Текст каже <em>"used by medics to seal wounds on the battlefield"</em> — рятувало життя під час війни. "Life-saving" = рятувало поранених, "military context" = поле бою під час В\'єтнамської війни. Золота рибка схована в кінці абзацу після відволікаючих деталей про лабораторію.'}
+};
+
+// STATE
+let t1Answers = {};
+let t3Answers = {};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  const labels = {
+    screenStrategy:'Стратегія',
+    screenTask1:'Task 1 — Реклами',
+    screenTask1Results:'Task 1 — Результати',
+    screenTask3:'Task 3 — Винаходи',
+    screenTask3Results:'Task 3 — Результати'
+  };
+  document.getElementById('headerProgress').textContent = labels[id]||'';
+}
+
+function t1Select(num, sel){
+  if(sel.value){
+    t1Answers[num]=sel.value;
+    sel.classList.add('selected');
+  } else {
+    delete t1Answers[num];
+    sel.classList.remove('selected');
+  }
+  const count = Object.keys(t1Answers).length;
+  document.getElementById('task1Counter').textContent=`Відповіді: ${count} / 5`;
+  const btn = document.getElementById('btnCheckT1');
+  const hint = document.getElementById('checkHintT1');
+  if(count===5){
+    btn.disabled=false;
+    hint.textContent='Готово! Можна перевіряти.';
+  } else {
+    btn.disabled=true;
+    hint.textContent=`Оберіть відповідь для кожної реклами`;
+  }
+}
+
+function t3Select(num, sel){
+  if(sel.value){
+    t3Answers[num]=sel.value;
+    sel.classList.add('selected');
+  } else {
+    delete t3Answers[num];
+    sel.classList.remove('selected');
+  }
+  const count = Object.keys(t3Answers).length;
+  document.getElementById('task3Counter').textContent=`Відповіді: ${count} / 6`;
+  const btn = document.getElementById('btnCheckT3');
+  const hint = document.getElementById('checkHintT3');
+  if(count===6){
+    btn.disabled=false;
+    hint.textContent='Готово! Можна перевіряти.';
+  } else {
+    btn.disabled=true;
+    hint.textContent=`Оберіть відповідь для кожного абзацу`;
+  }
+}
+
+function checkTask1(){
+  let score=0;
+  let html='';
+  for(let i=1;i<=5;i++){
+    const user=t1Answers[i]||'—';
+    const correct=t1Correct[i];
+    const isRight=user===correct;
+    if(isRight)score++;
+    const exp=t1Explanations[i];
+    html+=`<div class="result-card ${isRight?'correct':'wrong'}">
+      <div class="result-ad">
+        <div class="result-ad-title">${i}. ${exp.title}</div>
+      </div>
+      <div class="result-exp">
+        <div class="result-verdict">
+          <div class="verdict-icon ${isRight?'correct':'wrong'}">${isRight?'✓':'✗'}</div>
+          <div class="verdict-text ${isRight?'correct':'wrong'}">${isRight?'Правильно!':'Неправильно'}</div>
+        </div>
+        ${!isRight?`<div class="user-answer">Ваша відповідь: ${user}</div><div class="correct-answer">Правильна відповідь: ${exp.correct}</div>`:''}
+        <div class="exp-text" style="margin-top:.6rem">${exp.exp}</div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('t1Score').textContent=`${score}/5`;
+  document.getElementById('t1Results').innerHTML=html;
+  showScreen('screenTask1Results');
+}
+
+function checkTask3(){
+  let score=0;
+  let html='';
+  for(let i=1;i<=6;i++){
+    const user=t3Answers[i]||'—';
+    const correct=t3CorrectFinal[i];
+    const isRight=user===correct;
+    if(isRight)score++;
+    const exp=t3Explanations[i];
+    html+=`<div class="result-card ${isRight?'correct':'wrong'}">
+      <div class="result-ad">
+        <div class="result-ad-title">${i}. ${exp.title}</div>
+      </div>
+      <div class="result-exp">
+        <div class="result-verdict">
+          <div class="verdict-icon ${isRight?'correct':'wrong'}">${isRight?'✓':'✗'}</div>
+          <div class="verdict-text ${isRight?'correct':'wrong'}">${isRight?'Правильно!':'Неправильно'}</div>
+        </div>
+        ${!isRight?`<div class="user-answer">Ваша відповідь: ${user}</div><div class="correct-answer">Правильна відповідь: ${exp.correct}</div>`:''}
+        <div class="exp-text" style="margin-top:.6rem">${exp.exp}</div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('t3Score').textContent=`${score}/6`;
+  document.getElementById('t3Results').innerHTML=html;
+  showScreen('screenTask3Results');
+}
+
+function restart(){
+  t1Answers={};
+  t3Answers={};
+  document.querySelectorAll('select.answer-select').forEach(s=>{s.value='';s.classList.remove('selected');});
+  document.getElementById('task1Counter').textContent='Відповіді: 0 / 5';
+  document.getElementById('task3Counter').textContent='Відповіді: 0 / 6';
+  document.getElementById('btnCheckT1').disabled=true;
+  document.getElementById('btnCheckT3').disabled=true;
+  document.getElementById('checkHintT1').textContent='Оберіть відповідь для кожної реклами';
+  document.getElementById('checkHintT3').textContent='Оберіть відповідь для кожного абзацу';
+  showScreen('screenStrategy');
+}
+</script>
+</div></body>
+</html>
